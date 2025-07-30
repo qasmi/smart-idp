@@ -13,6 +13,6 @@ docker run --rm \
   -v "$(realpath ../gitops-chart):/chart" \
   -w /work \
   alpine/helm \
-  template /chart --values $path/config.yaml > ./.k8s-gen-output/manifests.yaml
+  template /chart --values $path/config.yaml > ./.k8s-gen/manifests.yaml
   
 rm -rf $path

@@ -22,7 +22,8 @@
         "kubectl apply -f config/lb-ipam.yaml",
         "kubectl apply -f config/l2-announcement.yaml",
         "helm repo add argo https://argoproj.github.io/argo-helm",
-        "helm upgrade --install argocd argo-cd --repo https://argoproj.github.io/argo-helm --namespace argocd --create-namespace --values addons/argocd.yaml --wait --timeout 15m --atomic"
+        "helm upgrade --install argocd argo-cd --repo https://argoproj.github.io/argo-helm --namespace argocd --create-namespace --values addons/argocd.yaml --wait --timeout 15m --atomic",
+        "kubectl apply -f demo-cluster/.bootstrap/app-of-apps.yaml"
       ],
       "shutdown": [
         "kind delete cluster"
