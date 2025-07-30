@@ -13,7 +13,7 @@ spec:
         repoURL: {{ $.Values.gitops.repository }}
         revision: {{ $.Values.gitops.revision | default "HEAD" }}
         files:
-          - path: team-{{ $teamName }}/apps.yaml
+          - path: "{{ $.Values.environment.name }}/team-{{ $teamName }}/apps.yaml"
   template:
     metadata:
       name: '{{`{{ .name }}`}}'
@@ -41,11 +41,11 @@ spec:
           helm:
             valueFiles:
             {{`{{- range .valueFiles }}`}}
-              - $valuesRef/team-{{ $teamName }}/values/{{`{{ . }}`}}
+              - $valuesRef/{{ $.Values.environment.name }}/team-{{ $teamName }}/values/{{`{{ . }}`}}
             {{`{{- end }}`}}
         - repoURL: '{{ $.Values.gitops.repository }}'
           targetRevision: '{{ $.Values.gitops.revision | default "HEAD" }}'
-          path: team-{{ $teamName }}/values
+          path: {{ $.Values.environment.name }}/team-{{ $teamName }}/values
           ref: valuesRef
     {{`{{- if .autoSync }}`}}
       syncPolicy:

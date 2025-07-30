@@ -98,7 +98,7 @@ spec:
         repoURL: https://github.com/qasmi/smart-idp.git
         revision: HEAD
         files:
-          - path: team-platform/apps.yaml
+          - path: "demo-cluster/team-platform/apps.yaml"
   template:
     metadata:
       name: '{{ .name }}'
@@ -126,11 +126,11 @@ spec:
           helm:
             valueFiles:
             {{- range .valueFiles }}
-              - $valuesRef/team-platform/values/{{ . }}
+              - $valuesRef/demo-cluster/team-platform/values/{{ . }}
             {{- end }}
         - repoURL: 'https://github.com/qasmi/smart-idp.git'
           targetRevision: 'HEAD'
-          path: team-platform/values
+          path: demo-cluster/team-platform/values
           ref: valuesRef
     {{- if .autoSync }}
       syncPolicy:

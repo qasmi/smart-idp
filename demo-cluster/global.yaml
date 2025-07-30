@@ -1,5 +1,5 @@
 environment:
-  name: demo
+  name: demo-cluster
 
 #certificateClusterIssuer:
 #  name: demo-cluster
