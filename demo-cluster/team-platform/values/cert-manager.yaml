@@ -1,0 +1,52 @@
+crds:
+  enabled: true
+  keep: true
+
+replicaCount: 1
+
+global:
+  leaderElection:
+    namespace: cert-manager
+
+resources:
+  limits:
+    cpu: 10m
+    memory: 600Mi
+  requests:
+    cpu: 10m
+    memory: 400Mi
+
+
+cainjector:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 20m
+      memory: 200Mi
+    requests:
+      cpu: 20m
+      memory: 200Mi
+
+webhook:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: 20m
+      memory: 150Mi
+    requests:
+      cpu: 20m
+      memory: 150Mi
+
+startupapicheck:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 24Mi
+
+extraArgs:
+  - '--dns01-recursive-nameservers-only'
+  - '--dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53'
+  - '--enable-gateway-api'

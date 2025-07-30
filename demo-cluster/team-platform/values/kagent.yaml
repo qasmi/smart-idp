@@ -1,0 +1,87 @@
+replicaCount: 1
+
+providers:
+  default: ollama
+  ollama:
+    provider: Ollama
+    model: "mistral"
+    config:
+      host: http://ollama.ollama.svc.cluster.local
+
+database:
+  type: sqlite
+  sqlite:
+    databaseName: kagent.db
+
+controller:
+  loglevel: "debug"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+tools:
+  loglevel: "debug"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+mcp:
+  doc2vec:
+    enabled: true
+
+app:
+  loglevel: "debug"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+ui:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+k8s-agent:
+  enabled: true
+
+kgateway-agent:
+  enabled: false
+
+istio-agent:
+  enabled: false
+
+promql-agent:
+  enabled: false
+
+observability-agent:
+  enabled: false
+
+argo-rollouts-agent:
+  enabled: false
+
+helm-agent:
+  enabled: true
+
+cilium-policy-agent:
+  enabled: true
+
+cilium-manager-agent:
+  enabled: true
+
+cilium-debug-agent:
+  enabled: true

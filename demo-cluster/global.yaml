@@ -1,0 +1,17 @@
+environment:
+  name: demo
+
+certificateClusterIssuer:
+  name: demo-cluster
+  owner: platform
+
+teams:
+  platform:
+    clusterAdmin: true
+
+argocd:
+  namespace: argocd
+
+gitops:
+  repository: https://github.com/qasmi/smart-idp.git
+  revisionHistoryLimit: 3

@@ -1,0 +1,153 @@
+crds:
+  install: true
+  reportsServer:
+    enabled: true
+  groups:
+    kyverno:
+      cleanuppolicies: true
+      clustercleanuppolicies: true
+      clusterpolicies: true
+      globalcontextentries: true
+      policies: true
+      policyexceptions: true
+      updaterequests: true
+      validatingpolicies: true
+    policies:
+      validatingpolicies: true
+      policyexceptions: true
+      imagevalidatingpolicies: false
+    reports:
+      clusterephemeralreports: true
+      ephemeralreports: true
+    wgpolicyk8s:
+      clusterpolicyreports: true
+      policyreports: true
+  migration:
+    enabled: true
+    podResources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+      requests:
+        cpu: 10m
+        memory: 64Mi
+
+config:
+  create: true
+  webhooks:
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+          - kube-system
+
+  resourceFiltersExcludeNamespaces: []
+  resourceFiltersExclude: []
+
+webhooksCleanup:
+  enabled: true
+  autoDeleteWebhooks:
+    enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+policyReportsCleanup:
+  enabled: true
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+grafana:
+  enabled: false
+
+features:
+  admissionReports:
+    enabled: true
+  aggregateReports:
+    enabled: true
+  policyReports:
+    enabled: true
+  validatingAdmissionPolicyReports:
+    enabled: true
+  reporting:
+    validate: true
+    mutate: true
+    mutateExisting: true
+    imageVerify: false
+    generate: true
+  backgroundScan:
+    enabled: true
+    backgroundScanWorkers: 1
+    backgroundScanInterval: 30min
+    skipResourceFilters: true
+  controllerRuntimeMetrics:
+    bindAddress: ":8080"
+  forceFailurePolicyIgnore:
+    enabled: true
+  generateValidatingAdmissionPolicy:
+    enabled: true
+
+admissionController:
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    targetCPUUtilizationPercentage: 80
+  replicas: 1
+  revisionHistoryLimit: 3
+  resyncPeriod: 15m
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+  container:
+    resources:
+      limits:
+        memory: 384Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+backgroundController:
+  enabled: false
+  replicas: 1
+  revisionHistoryLimit: 3
+  resyncPeriod: 15m
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+cleanupController:
+  enabled: false
+  replicas: 1
+  revisionHistoryLimit: 2
+  resyncPeriod: 15m
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
+
+reportsController:
+  enabled: false
+  replicas: 1
+  revisionHistoryLimit: 3
+  resyncPeriod: 15m
+  resources:
+    limits:
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 64Mi
