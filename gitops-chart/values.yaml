@@ -1,0 +1,20 @@
+environment:
+  name: ''
+
+teams: {}
+
+projects: {}
+
+applications: {}
+
+namespaces: {}
+
+certificateClusterIssuer: {}
+
+argocd:
+  namespace: argocd
+
+gitops:
+  repository: ''
+  revisionHistoryLimit: 3
+  

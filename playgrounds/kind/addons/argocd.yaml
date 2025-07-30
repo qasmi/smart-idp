@@ -1,0 +1,42 @@
+global:
+  logging:
+    format: json
+
+configs:
+  rbac:
+    create: true
+    scopes: '[email,groups]'
+    policy.default: role:readonly
+    policy.csv: |
+      p, role:readonly, applications, get, */*, allow
+      p, role:admin, applications, *, */*, allow
+
+applicationSet:
+  replicas: 1
+      
+controller:
+  extraArgs:
+    - --app-resync=20
+  replicas: 1
+  enableStatefulSet: true
+  logFormat: json
+
+redis-ha:
+  enabled: false
+  
+repoServer:
+  logFormat: json
+  logLevel: "warn"
+
+server:
+  extraArgs:
+    - --insecure
+  service:
+    type: LoadBalancer
+  logFormat: json
+      
+dex:
+  enabled: false
+
+notifications:
+  enabled: false

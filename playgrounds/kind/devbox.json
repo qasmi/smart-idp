@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.15.0/.schema/devbox.schema.json",
+  "packages": [
+    "kind@0.29.0",
+    "kubernetes-helm@3.14.4",
+    "cilium-cli@0.18.5",
+    "curl@8.7.1",
+    "glow@1.5.1",
+    "docker@24.0.5",
+    "kubectl@1.33.0"
+  ],
+  "shell": {
+    "init_hook": [
+      "glow README.md"
+    ],
+    "scripts": {
+      "setup": [
+        "kind create cluster --config config/kind.yaml",
+        "kubectl get node",
+        "helm upgrade --install --wait --timeout 15m --atomic --namespace kube-system --repo https://helm.cilium.io cilium cilium --values config/cilium.yaml",
+        "kubectl get node",
+        "kubectl apply -f config/lb-ipam.yaml",
+        "kubectl apply -f config/l2-announcement.yaml",
+        "helm repo add argo https://argoproj.github.io/argo-helm",
+        "helm upgrade --install argocd argo-cd --repo https://argoproj.github.io/argo-helm --namespace argocd --create-namespace --values addons/argocd.yaml --wait --timeout 15m --atomic"
+      ],
+      "shutdown": [
+        "kind delete cluster"
+      ]
+    }
+  }
+}

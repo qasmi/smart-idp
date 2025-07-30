@@ -1,0 +1,54 @@
+{{- range $projectName, $project := .Values.projects }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: {{ $projectName }}
+  namespace: {{ required "argocd.namespace is required" $.Values.argocd.namespace }}
+  {{- if $project.annotations }}
+  annotations:
+    {{- toYaml $project.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  description: Project {{ $projectName }}
+  destinations:
+    {{- $namespaces := list }}
+    {{- range $namespaceName, $namespace := $.Values.namespaces }}
+    {{- if eq $namespace.project $projectName }}
+    {{- $namespaces = append $namespaces $namespaceName }}
+    {{- end }}
+    {{- end }}
+    {{- range $appName, $app := $.Values.applications }}
+    {{- if eq $app.project $projectName }}
+    {{- $namespaces = append $namespaces $app.namespace }}
+    {{- end }}
+    {{- end }}
+    {{- if $project.includeNamespaces }}
+    {{- range $project.includeNamespaces }}
+    {{- $namespaces = append $namespaces . }}
+    {{- end }}
+    {{- end }}
+    {{- range uniq $namespaces }}
+    - server: https://kubernetes.default.svc
+      {{- if . }}
+      namespace: {{ . }}
+      {{- end }}
+    {{- end }}
+  sourceRepos:
+    - {{ $.Values.gitops.repository }}
+    {{- $appRepos := list }}
+    {{- range $appName, $app := $.Values.applications }}
+    {{- if eq $app.project $projectName }}
+    {{- $appRepos = append $appRepos $app.repo }}
+    {{- end }}
+    {{- end }}
+    {{- range uniq $appRepos }}
+    - {{ . }}
+    {{- end }}
+  {{- if $project.clusterResourceWhitelist }}
+  clusterResourceWhitelist:
+    {{- toYaml $project.clusterResourceWhitelist | nindent 4 }}
+  {{- else }}
+  clusterResourceWhitelist: []
+  {{- end }}
+{{- end }}

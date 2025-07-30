@@ -1,0 +1,5 @@
+apiVersion: v2
+name: gitops-chart
+description: GitOps engine
+
+version: 0.1.0

@@ -1,0 +1,12 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+networking:
+  disableDefaultCNI: true
+  kubeProxyMode: none
+nodes:
+- role: control-plane
+  image: kindest/node:v1.33.2
+- role: worker-1
+  image: kindest/node:v1.33.2
+- role: worker-2
+  image: kindest/node:v1.33.2

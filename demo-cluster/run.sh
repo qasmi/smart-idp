@@ -10,7 +10,7 @@ cat global.yaml >> $path/config.yaml
 
 docker run --rm \
   -v "${PWD}:/work" \
-  -v "$(realpath ../.gitops-chart):/chart" \
+  -v "$(realpath ../gitops-chart):/chart" \
   -w /work \
   alpine/helm \
   template /chart --values $path/config.yaml > ./.k8s-gen-output/manifests.yaml
