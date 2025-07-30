@@ -17,6 +17,7 @@
       "setup": [
         "kind create cluster --config config/kind.yaml",
         "kubectl get node",
+        "./config/coredns-patch.sh",
         "helm upgrade --install --wait --timeout 15m --atomic --namespace kube-system --repo https://helm.cilium.io cilium cilium --values config/cilium.yaml",
         "kubectl get node",
         "kubectl apply -f config/lb-ipam.yaml",

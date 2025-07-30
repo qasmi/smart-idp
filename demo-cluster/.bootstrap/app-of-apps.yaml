@@ -10,7 +10,7 @@ spec:
   revisionHistoryLimit: 5
   source:
     repoURL: https://github.com/qasmi/smart-idp.git
-    path: .k8s-gen/
+    path: ./demo-cluster/.k8s-gen/
     targetRevision: HEAD
   destination:
     server: 'https://kubernetes.default.svc'
