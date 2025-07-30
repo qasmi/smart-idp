@@ -38,7 +38,6 @@ spec:
       namespace: kagent
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
-    - ghcr.io/kagent-dev/kagent/helm
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
@@ -71,7 +70,6 @@ spec:
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - https://charts.jetstack.io
-    - https://kyverno.github.io/kyverno
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
