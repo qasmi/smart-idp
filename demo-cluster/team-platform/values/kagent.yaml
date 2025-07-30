@@ -15,23 +15,9 @@ database:
 
 controller:
   loglevel: "debug"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 1000m
-      memory: 512Mi
 
 tools:
   loglevel: "debug"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 1000m
-      memory: 512Mi
 
 mcp:
   doc2vec:
@@ -39,22 +25,6 @@ mcp:
 
 app:
   loglevel: "debug"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
-
-ui:
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 1000m
-      memory: 1Gi
 
 k8s-agent:
   enabled: true

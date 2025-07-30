@@ -24,13 +24,6 @@ crds:
       policyreports: true
   migration:
     enabled: true
-    podResources:
-      limits:
-        cpu: 100m
-        memory: 256Mi
-      requests:
-        cpu: 10m
-        memory: 64Mi
 
 config:
   create: true
@@ -49,23 +42,9 @@ webhooksCleanup:
   enabled: true
   autoDeleteWebhooks:
     enabled: true
-  resources:
-    limits:
-      cpu: 100m
-      memory: 256Mi
-    requests:
-      cpu: 10m
-      memory: 64Mi
 
 policyReportsCleanup:
   enabled: true
-  resources:
-    limits:
-      cpu: 100m
-      memory: 256Mi
-    requests:
-      cpu: 10m
-      memory: 64Mi
 
 grafana:
   enabled: false
@@ -108,46 +87,21 @@ admissionController:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
-  container:
-    resources:
-      limits:
-        memory: 384Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
 
 backgroundController:
   enabled: false
   replicas: 1
   revisionHistoryLimit: 3
   resyncPeriod: 15m
-  resources:
-    limits:
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 64Mi
 
 cleanupController:
   enabled: false
   replicas: 1
   revisionHistoryLimit: 2
   resyncPeriod: 15m
-  resources:
-    limits:
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 64Mi
 
 reportsController:
   enabled: false
   replicas: 1
   revisionHistoryLimit: 3
   resyncPeriod: 15m
-  resources:
-    limits:
-      memory: 128Mi
-    requests:
-      cpu: 100m
-      memory: 64Mi
