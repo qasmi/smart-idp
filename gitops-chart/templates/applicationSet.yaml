@@ -20,10 +20,8 @@ spec:
       namespace: {{ required "argocd.namespace is required" $.Values.argocd.namespace }}
       annotations:
         argocd.argoproj.io/sync-wave: '{{`{{ .syncWave | default "10" }}`}}'
-      {{- if (default true $team.finalize) }}
       finalizers:
-        - resources-finalizer.argocd.argoproj.io
-      {{- end }}
+        - "resources-finalizer.argocd.argoproj.io"
     spec:
       project: '{{`{{ .project }}`}}'
       revisionHistoryLimit: {{ $.Values.gitops.revisionHistoryLimit }}

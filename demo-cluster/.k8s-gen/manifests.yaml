@@ -106,7 +106,7 @@ spec:
       annotations:
         argocd.argoproj.io/sync-wave: '{{ .syncWave | default "10" }}'
       finalizers:
-        - resources-finalizer.argocd.argoproj.io
+        - "resources-finalizer.argocd.argoproj.io"
     spec:
       project: '{{ .project }}'
       revisionHistoryLimit: 3
