@@ -1,9 +1,9 @@
 environment:
   name: demo
 
-certificateClusterIssuer:
-  name: demo-cluster
-  owner: platform
+#certificateClusterIssuer:
+#  name: demo-cluster
+#  owner: platform
 
 teams:
   platform:

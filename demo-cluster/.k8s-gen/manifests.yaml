@@ -169,11 +169,3 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
----
-# Source: gitops-chart/templates/clusterIssuer.yaml
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: demo-cluster
-spec:
-  selfSigned: {}
