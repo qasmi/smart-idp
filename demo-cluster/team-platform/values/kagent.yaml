@@ -4,9 +4,9 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "orca-mini"
+    model: "llama3.2"
     config:
-      host: http://ollama-model-orca-mini.ollama-apps.svc.cluster.local:11434
+      host: http://ollama-model-llama3.2.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite

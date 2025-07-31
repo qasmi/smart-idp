@@ -1,7 +1,7 @@
 apiVersion: ollama.ayaka.io/v1
 kind: Model
 metadata:
-  name: orca-mini
+  name: llama3.2
   namespace: ollama-apps
 spec:
-  image: ollama/orca-mini
+  image: ollama/llama3.2
