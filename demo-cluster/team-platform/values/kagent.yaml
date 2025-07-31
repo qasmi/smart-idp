@@ -1,12 +1,12 @@
 replicaCount: 1
 
 providers:
-  default: openAI
-  openAI:
-    provider: OpenAI
-    model: "gpt-4.1-mini"
-    apiKeySecretRef: kagent-openai
-    apiKeySecretKey: OPENAI_API_KEY
+  default: ollama
+  ollama:
+    provider: Ollama
+    model: "orca-mini"
+    config:
+      host: http://ollama-model-orca-mini.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite
