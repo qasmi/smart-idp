@@ -5,8 +5,8 @@ providers:
   openAI:
     provider: OpenAI
     model: "gpt-4.1-mini"
-    apiKeySecretRef: openai-api-key
-    apiKeySecretKey: kagent-openai
+    apiKeySecretRef: kagent-openai
+    apiKeySecretKey: OPENAI_API_KEY
 
 database:
   type: sqlite
