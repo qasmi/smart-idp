@@ -8,17 +8,17 @@
   valueFiles: []
   autoSync:
     enabled: true
-#- name: kagent
-#  owner: platform
-#  project: platform
-#  namespace: kagent
-#  repo: ghcr.io/kagent-dev/kagent/helm
-#  chart: kagent
-#  version: "*"
-#  valueFiles:
-#    - kagent.yaml
-#  autoSync:
-#    enabled: true
+- name: kagent
+  owner: platform
+  project: platform
+  namespace: kagent
+  repo: ghcr.io/kagent-dev/kagent/helm
+  chart: kagent
+  version: "*"
+  valueFiles:
+    - kagent.yaml
+  autoSync:
+    enabled: true
 #- name: kyverno
 #  owner: platform
 #  project: security
