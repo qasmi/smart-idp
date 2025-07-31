@@ -18,13 +18,15 @@
         "kind create cluster --config config/kind.yaml",
         "kubectl get node",
         "./config/coredns-patch.sh",
-        "helm upgrade --install --wait --timeout 15m --atomic --namespace kube-system --repo https://helm.cilium.io cilium cilium --values config/cilium.yaml",
+        "helm upgrade --install --namespace kube-system --repo https://helm.cilium.io cilium cilium --values config/cilium.yaml --wait --timeout 15m --atomic",
+        "cilium status --wait",
         "kubectl get node",
         "kubectl apply -f config/lb-ipam.yaml",
         "kubectl apply -f config/l2-announcement.yaml",
         "helm repo add argo https://argoproj.github.io/argo-helm",
         "helm upgrade --install argocd argo-cd --repo https://argoproj.github.io/argo-helm --namespace argocd --create-namespace --values addons/argocd.yaml --wait --timeout 15m --atomic",
-        "kubectl apply -f demo-cluster/.bootstrap/app-of-apps.yaml"
+        "kubectl apply -f addons/gitops-repo.yaml",
+        "kubectl apply -f ../../demo-cluster/.bootstrap/app-of-apps.yaml"
       ],
       "shutdown": [
         "kind delete cluster"

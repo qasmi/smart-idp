@@ -38,6 +38,7 @@ spec:
       namespace: kagent
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
+    - ghcr.io/kagent-dev/kagent/helm
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
