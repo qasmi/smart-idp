@@ -1,7 +1,7 @@
 apiVersion: ollama.ayaka.io/v1
 kind: Model
 metadata:
-  name: llama3.2
+  name: hermes-2-pro-llama-3-8b
   namespace: ollama-apps
 spec:
-  image: ollama/llama3.2
+  image: cas/hermes-2-pro-llama-3-8b

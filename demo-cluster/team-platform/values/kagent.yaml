@@ -4,9 +4,9 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "llama3.2"
+    model: "hermes-2-pro-llama-3-8b"
     config:
-      host: http://ollama-model-llama3.2.ollama-apps.svc.cluster.local:11434
+      host: http://ollama-model-hermes-2-pro-llama-3-8b.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite
