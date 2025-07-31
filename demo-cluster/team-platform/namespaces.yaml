@@ -1,7 +1,4 @@
 namespaces:
-  cert-manager:
-    owner: platform
-    project: security
   argocd:
     owner: platform
     project: platform
