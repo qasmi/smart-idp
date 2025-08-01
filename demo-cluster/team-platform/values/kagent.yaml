@@ -4,7 +4,7 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "llama-3"
+    model: "llama3"
     config:
       host: http://ollama-model-llama3.ollama-apps.svc.cluster.local:11434
 
