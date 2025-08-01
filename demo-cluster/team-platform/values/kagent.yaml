@@ -4,9 +4,9 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "tinyllama"
+    model: "mistral"
     config:
-      host: http://ollama-model-tinyllama.ollama-apps.svc.cluster.local:11434
+      host: http://ollama-model-mistral.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite

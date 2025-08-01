@@ -1,7 +1,7 @@
 apiVersion: ollama.ayaka.io/v1
 kind: Model
 metadata:
-  name: tinyllama
+  name: mistral
   namespace: ollama-apps
 spec:
-  image: ollama/tinyllama
+  image: ollama/mistral
