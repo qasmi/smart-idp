@@ -23,8 +23,8 @@ mcp:
   doc2vec:
     enabled: true
 
-app:
-  loglevel: "debug"
+#app:
+#  loglevel: "debug"
 
 k8s-agent:
   enabled: true
