@@ -4,7 +4,7 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "mistral:latest"
+    model: "mistral-small"
     config:
       host: http://ollama.ollama-apps.svc.cluster.local:11434
 

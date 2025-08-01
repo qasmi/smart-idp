@@ -1,7 +1,0 @@
-apiVersion: ollama.ayaka.io/v1
-kind: Model
-metadata:
-  name: mistral
-  namespace: ollama-apps
-spec:
-  image: ollama/qwen2.5-coder:32b
