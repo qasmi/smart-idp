@@ -1,7 +1,7 @@
 apiVersion: ollama.ayaka.io/v1
 kind: Model
 metadata:
-  name: llama3
+  name: mistral
   namespace: ollama-apps
 spec:
-  image: ollama/llama3.2
+  image: ollama/mistral
