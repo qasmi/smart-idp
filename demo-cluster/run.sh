@@ -8,11 +8,6 @@ echo "" >> $path/config.yaml
 yq eval-all '.namespaces as $item ireduce ({}; . * {"namespaces": $item})' ./team-*/namespaces.yaml >> $path/config.yaml
 cat global.yaml >> $path/config.yaml
 
-docker run --rm \
-  -v "${PWD}:/work" \
-  -v "$(realpath ../gitops-chart):/chart" \
-  -w /work \
-  alpine/helm \
-  template /chart --values $path/config.yaml > ./.k8s-gen/manifests.yaml
+helm template ../gitops-chart --values $path/config.yaml > ./.k8s-gen/manifests.yaml
   
 rm -rf $path

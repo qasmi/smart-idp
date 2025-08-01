@@ -6,7 +6,7 @@ providers:
     provider: Ollama
     model: "llama-3"
     config:
-      host: http://ollama-model-llama-3.ollama-apps.svc.cluster.local:11434
+      host: http://ollama-model-llama3.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite
