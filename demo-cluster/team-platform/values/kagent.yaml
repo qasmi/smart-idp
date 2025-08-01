@@ -4,7 +4,7 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "qwen2.5-coder:latest"
+    model: "mistral:latest"
     config:
       host: http://ollama.ollama-apps.svc.cluster.local:11434
 
