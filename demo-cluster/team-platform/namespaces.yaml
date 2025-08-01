@@ -8,3 +8,6 @@ namespaces:
   kyverno:
     owner: platform
     project: security
+  ollama-apps:
+    owner: platform
+    project: platform
