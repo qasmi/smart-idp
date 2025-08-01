@@ -4,9 +4,9 @@ providers:
   default: ollama
   ollama:
     provider: Ollama
-    model: "mistral"
+    model: "qwen2.5-coder:latest"
     config:
-      host: http://ollama-model-mistral.ollama-apps.svc.cluster.local:11434
+      host: http://ollama.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite

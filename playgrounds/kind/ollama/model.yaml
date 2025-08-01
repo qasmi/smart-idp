@@ -4,4 +4,4 @@ metadata:
   name: mistral
   namespace: ollama-apps
 spec:
-  image: ollama/mistral
+  image: ollama/qwen2.5-coder:32b
