@@ -4,7 +4,7 @@ providers:
   default: openAI
   openAI:
     provider: OpenAI
-    model: "gpt-3.5-turbo"
+    model: "gpt-4o"
     apiKeySecretRef: kagent-openai
     apiKeySecretKey: OPENAI_API_KEY
 
