@@ -1,12 +1,12 @@
 replicaCount: 1
 
 providers:
-  default: openAI
-  openAI:
-    provider: OpenAI
-    model: "gpt-4o"
-    apiKeySecretRef: kagent-openai
-    apiKeySecretKey: OPENAI_API_KEY
+  default: ollama
+  ollama:
+    provider: Ollama
+    model: "mistral"
+    config:
+      host: http://ollama.ollama-apps.svc.cluster.local:11434
 
 database:
   type: sqlite
