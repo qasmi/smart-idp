@@ -1,12 +1,10 @@
-replicaCount: 1
-
 providers:
   default: ollama
   ollama:
     provider: Ollama
     model: "mistral"
     config:
-      host: http://ollama.ollama-apps.svc.cluster.local:11434
+      host: http://ollama.ollama.svc.cluster.local:11434
 
 database:
   type: sqlite
@@ -14,44 +12,68 @@ database:
     databaseName: kagent.db
 
 controller:
-  loglevel: "debug"
+  replicas: 1
+  loglevel: "info"
+  streaming: # Streaming buffer size for A2A communication
+    maxBufSize: 16Mi  # 16 * 1024 * 1024
+    initialBufSize: 16Ki # optional, larger starting buffer
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 2
+      memory: 512Mi
+  service:
+    type: ClusterIP
+    ports:
+      port: 8083
+      targetPort: 8083
 
-tools:
-  loglevel: "debug"
+ui:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+kagent-tools:
+  fullnameOverride: kagent-tools
+  enabled: true
+  replicaCount: 1
+  tools:
+    loglevel: "debug"
 
-mcp:
-  doc2vec:
+agents:
+  k8s-agent:
     enabled: true
+  kgateway-agent:
+    enabled: false
+  istio-agent:
+    enabled: false
+  promql-agent:
+    enabled: false
+  observability-agent:
+    enabled: false
+  argo-rollouts-agent:
+    enabled: false
+  helm-agent:
+    enabled: false
+  cilium-policy-agent:
+    enabled: false
+  cilium-manager-agent:
+    enabled: false
+  cilium-debug-agent:
+    enabled: false
 
-#app:
-#  loglevel: "debug"
-
-k8s-agent:
+querydoc:
   enabled: true
+  replicas: 1
+  openai:
+    apiKey: ""
 
-kgateway-agent:
-  enabled: false
-
-istio-agent:
-  enabled: false
-
-promql-agent:
-  enabled: false
-
-observability-agent:
-  enabled: false
-
-argo-rollouts-agent:
-  enabled: false
-
-helm-agent:
-  enabled: true
-
-cilium-policy-agent:
-  enabled: true
-
-cilium-manager-agent:
-  enabled: true
-
-cilium-debug-agent:
-  enabled: true
+otel:
+  tracing:
+    enabled: false

@@ -6,7 +6,7 @@ metadata:
   namespace: ollama-apps
 subsets:
   - addresses:
-      - ip: 192.168.12.118
+      - ip: 192.168.12.206
     ports:
       - port: 11434
         name: http
