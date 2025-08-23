@@ -48,7 +48,7 @@ kagent-tools:
 
 agents:
   k8s-agent:
-    enabled: true
+    enabled: false
   kgateway-agent:
     enabled: false
   istio-agent:
