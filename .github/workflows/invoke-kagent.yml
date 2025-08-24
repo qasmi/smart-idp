@@ -17,4 +17,4 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
           extort OPENAI_API_KEY="nothing" && kagent install --kagent-url "http://demo-smart-idp.uk/api"
-          kagent --kagent-url "http://demo-smart-idp.uk/api" invoke --url-override "http://demo-smart-idp.uk/api" --agent k8s-agent  --task "Get the pods in the kagent namespace"
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --url-override "http://demo-smart-idp.uk/api" --agent k8s-agent  --task "Get the pods in the kagent namespace"
