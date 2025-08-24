@@ -17,6 +17,4 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
           curl http://demo-smart-idp.uk/health
-          sed -i.bak 's|http://localhost:8083|http://demo-smart-idp.uk/api|g' ~/.kagent/config.yaml
-          cat /home/runner/.kagent/config.yaml
           kagent --api-url "http://demo-smart-idp.uk/api" invoke --agent k8s-agent  --task "Get the pods in the kagent namespace"
