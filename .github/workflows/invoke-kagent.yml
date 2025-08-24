@@ -1,0 +1,18 @@
+name: Invoke KAgent
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  invoke-kagent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Invoke KAgent
+        run: |
+          kagent invoke --agent k8s-agent --api-url "http://demo-smart-idp.uk/api" --task "Get the pods in the kagent namespace"
