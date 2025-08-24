@@ -23,12 +23,6 @@ kind: Namespace
 metadata:
   name: ollama-apps
 ---
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: test-ns
----
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -44,8 +38,6 @@ spec:
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: ollama-apps
-    - server: https://kubernetes.default.svc
-      namespace: test-ns
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
