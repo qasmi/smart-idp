@@ -11,3 +11,6 @@ namespaces:
   ollama-apps:
     owner: platform
     project: platform
+  test-ns:
+    owner: platform
+    project: platform

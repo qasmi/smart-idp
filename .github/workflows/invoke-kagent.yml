@@ -16,4 +16,5 @@ jobs:
       - name: Invoke KAgent
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Get the pods in the kagent namespace"
+          ls 
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "what the manifets in demo-cluster/.k8s-gen/manifests.yaml will change in my cluster"
