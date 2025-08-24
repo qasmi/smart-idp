@@ -18,4 +18,4 @@ jobs:
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
           ls 
           file_content=$(< demo-cluster/.k8s-gen/manifests.yaml)
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "what the manifets will change in my cluster: $file_content"
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "compare the live state of my cluster with the desired state: $file_content. what this will change in my cluster ?"
