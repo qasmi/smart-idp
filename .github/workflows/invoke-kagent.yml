@@ -16,5 +16,5 @@ jobs:
       - name: Invoke KAgent
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
-          curl http://demo-smart-idp.uk/health
+          kagent install --kagent-url "http://demo-smart-idp.uk/api"
           kagent --kagent-url "http://demo-smart-idp.uk/api" invoke --url-override "http://demo-smart-idp.uk/api" --agent k8s-agent  --task "Get the pods in the kagent namespace"
