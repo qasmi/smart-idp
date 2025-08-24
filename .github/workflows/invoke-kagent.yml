@@ -16,4 +16,4 @@ jobs:
       - name: Invoke KAgent
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
-          kagent --kagent-url "http://demo-smart-idp.uk/api" invoke --url-override "http://demo-smart-idp.uk" --agent k8s-agent  --task "Get the pods in the kagent namespace"
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Get the pods in the kagent namespace"
