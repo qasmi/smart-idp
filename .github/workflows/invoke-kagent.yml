@@ -17,4 +17,4 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
           file_content=$(< demo-cluster/.k8s-gen/manifests.yaml)
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Analyze the following Kubernetes manifest in comparaison with the live state of the cluster, explain in a very short and symple way the impact of the changes and list potential misconfigurations in a short compact description : $file_content"
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Analyze the following Kubernetes manifest in comparison with the live state of the cluster. Explain in a very short and simple way the impact of the changes, and list potential misconfigurations. All explanations should be short, compact, and in bullet-point format. $file_content"
