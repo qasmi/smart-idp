@@ -13,8 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Invoke KAgent
+      - name: requirements
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
-          file_content=$(< demo-cluster/.k8s-gen/manifests.yaml)
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Compare this Kubernetes manifest with the live cluster. Output only resources that will change. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. $file_content"
+        
+          PROMPT_FILE="./ci-manifest-prompt.txt"
+          cat > "$PROMPT_FILE" <<EOF
+          Compare this Kubernetes manifest with the live cluster. Output only resources that will change. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. 
+
+          $(< demo-cluster/.k8s-gen/manifests.yaml)
+          EOF
+
+      - name: Invoke KAgent
+        run: |
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file $PROMPT_FILE
