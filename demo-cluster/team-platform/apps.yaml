@@ -23,7 +23,7 @@
   owner: platform
   project: platform
   namespace: kmcp-system
-  repo: oci://ghcr.io/kagent-dev/kmcp/helm
+  repo: ghcr.io/kagent-dev/kmcp/helm
   chart: kmcp-crds
   version: "*"
   valueFiles: []
@@ -33,7 +33,7 @@
   owner: platform
   project: platform
   namespace: kmcp-system
-  repo: oci://ghcr.io/kagent-dev/kmcp/helm
+  repo: ghcr.io/kagent-dev/kmcp/helm
   chart: kmcp
   version: "*"
   valueFiles: []
