@@ -17,4 +17,4 @@ jobs:
         run: |
           curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
           file_content=$(< demo-cluster/.k8s-gen/manifests.yaml)
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Analyze the following Kubernetes manifest in comparison with the live state of the cluster. Highlight only the resources that will change when applying this manifest. For each, explain in a very short and simple way the impact of the changes, and list potential misconfigurations. All explanations must be short, compact, and in bullet-point format. $file_content"
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent  --task "Compare this Kubernetes manifest with the live cluster. Output only resources that will change. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. $file_content"
