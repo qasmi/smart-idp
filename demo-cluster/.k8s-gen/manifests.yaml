@@ -46,10 +46,13 @@ spec:
       namespace: kmcp-system
     - server: https://kubernetes.default.svc
       namespace: ollama-apps
+    - server: https://kubernetes.default.svc
+      namespace: test
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
     - ghcr.io/kagent-dev/kmcp/helm
+    - https://charts.jetstack.io
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding

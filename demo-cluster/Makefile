@@ -28,4 +28,4 @@ generate:
 
 clean:
 	rm -rf $(PATH_DIR)
-	@echo "🧹 Cleaned up generated files."
+	@echo "Cleaned up generated files."
