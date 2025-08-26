@@ -14,27 +14,28 @@
   namespace: kagent
   repo: ghcr.io/kagent-dev/kagent/helm
   chart: kagent
-  version: "0.6.3"
+  version: "0.6.5"
   valueFiles:
     - kagent.yaml
   autoSync:
     enabled: true
-#- name: kyverno
-#  owner: platform
-#  project: security
-#  namespace: kyverno
-#  repo: https://kyverno.github.io/kyverno
-#  chart: kyverno
-#  version: 3.4.*
-#  valueFiles:
-#    - kyverno.yaml
-#  autoSync:
-#    enabled: true
-#  ignoreDifferences:
-#    - group: apiextensions.k8s.io
-#      kind: CustomResourceDefinition
-#      name: policies.kyverno.io
-#    - group: apiextensions.k8s.io
-#      kind: CustomResourceDefinition
-#      name: clusterpolicies.kyverno.io
-#
+- name: kmcp-crd
+  owner: platform
+  project: platform
+  namespace: kmcp-system
+  repo: oci://ghcr.io/kagent-dev/kmcp/helm
+  chart: kmcp-crds
+  version: "*"
+  valueFiles: []
+  autoSync:
+    enabled: true
+- name: kmcp
+  owner: platform
+  project: platform
+  namespace: kmcp-system
+  repo: oci://ghcr.io/kagent-dev/kmcp/helm
+  chart: kmcp
+  version: "*"
+  valueFiles: []
+  autoSync:
+    enabled: true

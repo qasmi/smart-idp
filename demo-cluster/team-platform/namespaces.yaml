@@ -11,3 +11,6 @@ namespaces:
   ollama-apps:
     owner: platform
     project: platform
+  kmcp-system:
+    owner: platform
+    project: platform

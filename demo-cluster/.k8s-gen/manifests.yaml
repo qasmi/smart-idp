@@ -15,6 +15,12 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: kmcp-system
+---
+# Source: gitops-chart/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
   name: kyverno
 ---
 # Source: gitops-chart/templates/namespace.yaml
@@ -37,10 +43,13 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: kagent
     - server: https://kubernetes.default.svc
+      namespace: kmcp-system
+    - server: https://kubernetes.default.svc
       namespace: ollama-apps
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
+    - oci://ghcr.io/kagent-dev/kmcp/helm
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
