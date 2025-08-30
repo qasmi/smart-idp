@@ -19,8 +19,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git checkout ${{ github.head_ref }}
-          
+          git checkout
+
           cd demo-cluster
           make
           cd ..
@@ -28,7 +28,7 @@ jobs:
           git add ./demo-cluster/.k8s-gen/
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update manifests [ci skip]"
-            git push origin ${{ github.head_ref }}
+            git push
 
             curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
             PROMPT_FILE="./ci-manifest-prompt.txt"
