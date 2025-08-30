@@ -15,18 +15,23 @@ jobs:
 
       - name: Generate Manifests
         run: |
+          # Configure Git identity
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          # Authenticate with token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
+          # Fetch the PR branch and create a local branch
           git fetch origin ${{ github.head_ref }} 
           git checkout -B ${{ github.head_ref }} origin/${{ github.head_ref }}
 
+          # Build manifests
           cd demo-cluster
           make || exit 1
           cd ..
 
+          # Add and commit changes if any
           git add ./demo-cluster/.k8s-gen/
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update manifests [ci skip]"
