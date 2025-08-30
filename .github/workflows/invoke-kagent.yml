@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-      contents: write
 
     steps:
       - name: Checkout repository
@@ -16,45 +15,49 @@ jobs:
 
       - name: Generate Manifests
         run: |
-          # Configure Git identity
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Authenticate with token
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-          # Fetch the PR branch and create a local branch
           git fetch origin ${{ github.head_ref }} 
           git checkout -B ${{ github.head_ref }} origin/${{ github.head_ref }}
 
-          # Build manifests
           cd demo-cluster
           make || exit 1
           cd ..
 
-          # Add and commit changes if any
           git add ./demo-cluster/.k8s-gen/
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update manifests [ci skip]"
             git push origin ${{ github.head_ref }} -o ci.skip
-            curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
-            PROMPT_FILE="./ci-manifest-prompt.txt"
-            {
-              echo "Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:"
-              cat demo-cluster/.k8s-gen/manifests.yaml
-            } > "$PROMPT_FILE"
-            
-            RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
-            | jq -r '.artifacts[0].parts[0].text')
-            echo "response<<EOF" >> $GITHUB_OUTPUT
-            echo "$RESPONSE" >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
           else
             echo "No changes to commit."
           fi
 
+      - name: Install KAgent
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
+
+      - name: Build prompt file
+        run: |
+          PROMPT_FILE="./ci-manifest-prompt.txt"
+          {
+            echo "Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:"
+            cat demo-cluster/.k8s-gen/manifests.yaml
+          } > "$PROMPT_FILE"
+
+      - name: Invoke KAgent
+        id: kagent
+        run: |
+          PROMPT_FILE="./ci-manifest-prompt.txt"
+          RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
+          | jq -r '.artifacts[0].parts[0].text')
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Add PR comment
-        if: ${{ steps.generate.outputs.response }}
         uses: mshick/add-pr-comment@v2
         with:
           message: |
@@ -62,25 +65,3 @@ jobs:
             ```
             ${{ steps.kagent.outputs.response }}
             ```
-#
-#      - name: Install KAgent
-#        run: |
-#          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
-#
-#      - name: Build prompt file
-#        run: |
-#          PROMPT_FILE="./ci-manifest-prompt.txt"
-#          {
-#            echo "Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:"
-#            cat demo-cluster/.k8s-gen/manifests.yaml
-#          } > "$PROMPT_FILE"
-#
-#      - name: Invoke KAgent
-#        id: kagent
-#        run: |
-#          PROMPT_FILE="./ci-manifest-prompt.txt"
-#          RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
-#          | jq -r '.artifacts[0].parts[0].text')
-#          echo "response<<EOF" >> $GITHUB_OUTPUT
-#          echo "$RESPONSE" >> $GITHUB_OUTPUT
-#          echo "EOF" >> $GITHUB_OUTPUT
