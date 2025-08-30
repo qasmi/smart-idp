@@ -44,16 +44,13 @@ jobs:
           PROMPT_FILE="./ci-manifest-prompt.txt"
           RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
             | jq -r '.result.status.message.parts[0].text // .result.artifacts[0].parts[0].text')
-          echo "response<<EOF" >> $GITHUB_OUTPUT
-          echo "$RESPONSE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT   # set output named 'response'
+      
       - name: Add PR comment
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            🤖 **KAgent Analysis**
-            Triggered by: ${{ github.actor }}
+            Triggered by: KAgent 🤖
             ```
-            ${{ steps.kagent.outputs.RESPONSE }}
+            ${{ steps.kagent.outputs.response }}
             ```
