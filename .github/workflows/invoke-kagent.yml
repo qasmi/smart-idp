@@ -55,5 +55,5 @@ jobs:
             🤖 **KAgent Analysis**
             Triggered by: ${{ github.actor }}
             ```
-            ${{ steps.kagent.outputs.response }}
+            ${{ steps.kagent.outputs.RESPONSE }}
             ```
