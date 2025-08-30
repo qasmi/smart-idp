@@ -19,8 +19,7 @@ jobs:
         
           PROMPT_FILE="./ci-manifest-prompt.txt"
           cat > "$PROMPT_FILE" <<EOF
-          describe the change that will be applyed and impact the cluster. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. 
-
+          Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:
           $(< demo-cluster/.k8s-gen/manifests.yaml)
           EOF
 
