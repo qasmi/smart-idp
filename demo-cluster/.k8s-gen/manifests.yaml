@@ -23,12 +23,6 @@ kind: Namespace
 metadata:
   name: kyverno
 ---
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ollama-apps
----
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -44,8 +38,6 @@ spec:
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
-    - server: https://kubernetes.default.svc
-      namespace: ollama-apps
     - server: https://kubernetes.default.svc
       namespace: test
   sourceRepos:
@@ -181,15 +173,3 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-  namespace: test
-spec:
-  containers:
-  - name: nginx
-    image: nginx:1.14.2
-    ports:
-    - containerPort: 80

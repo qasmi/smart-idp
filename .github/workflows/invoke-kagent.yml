@@ -19,7 +19,7 @@ jobs:
         
           PROMPT_FILE="./ci-manifest-prompt.txt"
           cat > "$PROMPT_FILE" <<EOF
-          Compare this Kubernetes manifest with the live cluster. Output only resources that will change. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. 
+          describe the change that will be applyed and impact the cluster. For each, write a single bullet in the format: Resource: <impact>; Risk: <misconfiguration>. Exclude unchanged resources. Do not write explanations, context, or sentences. 
 
           $(< demo-cluster/.k8s-gen/manifests.yaml)
           EOF
