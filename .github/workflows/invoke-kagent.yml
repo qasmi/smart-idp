@@ -1,7 +1,7 @@
 name: GioOps semantic validation
 
 on:
-  pull_request:
+  push:
     branches:
       - 'feat/*'
 
@@ -49,14 +49,13 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Add PR comment
-        if: github.event.pull_request != null
+        if: env.PR_NUMBER
         uses: peter-evans/create-or-update-comment@v4
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ env.PR_NUMBER }}
           body: |
             🤖 **KAgent Analysis**
             Triggered by: ${{ github.actor }}
             ```
             ${{ steps.kagent.outputs.response }}
             ```
-        
