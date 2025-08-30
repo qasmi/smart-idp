@@ -49,7 +49,8 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Add PR comment
-        uses: peter-evans/create-or-update-comment@v4
+        if: github.event.pull_request != null
+        uses: peter-evans/create-or-update-comment@v5
         with:
           issue-number: ${{ github.event.pull_request.number }}
           identifier: kagent-analysis
