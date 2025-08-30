@@ -28,7 +28,7 @@ jobs:
           git add ./demo-cluster/.k8s-gen/
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update manifests [ci skip]"
-            git push
+            git push origin ${{ github.head_ref }}
 
             curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
             PROMPT_FILE="./ci-manifest-prompt.txt"
