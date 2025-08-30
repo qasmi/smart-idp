@@ -17,12 +17,6 @@ kind: Namespace
 metadata:
   name: kmcp-system
 ---
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kyverno
----
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -70,8 +64,6 @@ metadata:
 spec:
   description: Project security
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: kyverno
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
   clusterResourceWhitelist:
