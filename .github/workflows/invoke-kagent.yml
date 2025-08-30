@@ -48,12 +48,16 @@ jobs:
           echo "$RESPONSE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      #- name: Add PR comment
-      #  uses: kagent/create-or-update-comment@v4
-      #  with:
-      #    issue-number: ${{ github.event.pull_request.number }}
-      #    body: |
-      #      🤖 **KAgent Analysis**
-      #      ```
-      #      ${{ steps.kagent.outputs.response }}
-      #      ```
+      - name: Add PR comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          identifier: kagent-analysis
+          body: |
+            🤖 **KAgent Analysis**
+            Triggered by: ${{ github.actor }}
+            ```
+            ${{ steps.kagent.outputs.response }}
+            ```
+        
