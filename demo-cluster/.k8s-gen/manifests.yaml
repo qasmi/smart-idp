@@ -174,25 +174,16 @@ spec:
     {{- end }}
     {{- end }}
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: nginx-deployment
-  namespace: joke
-  labels:
-    app: nginx
+  name: hello
+  namespace: notexist
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
   template:
-    metadata:
-      labels:
-        app: nginx
     spec:
       containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
+      - name: hello
+        image: busybox:1.28
+        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
+      restartPolicy: OnFailure

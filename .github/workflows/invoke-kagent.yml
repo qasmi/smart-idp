@@ -26,4 +26,5 @@ jobs:
       - name: Invoke KAgent
         run: |
           PROMPT_FILE="./ci-manifest-prompt.txt"
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file $PROMPT_FILE
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file $PROMPT_FILE  \
+          | jq -r '.result.status.message.parts[0].text'
