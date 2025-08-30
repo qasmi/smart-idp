@@ -1,7 +1,7 @@
 name: Invoke KAgent
 
 on:
-  push:
+  pull_request:
     branches:
       - 'feat/*'
 
@@ -57,3 +57,4 @@ jobs:
             ```
             ${{ steps.kagent.outputs.response }}
             ```
+        
