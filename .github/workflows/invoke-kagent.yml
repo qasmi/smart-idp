@@ -43,7 +43,7 @@ jobs:
         run: |
           PROMPT_FILE="./ci-manifest-prompt.txt"
           {
-            echo "Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:"
+            echo "Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied (as simple as you can for a developer). Focus only on real diffs that affect resources, and give very short answers:"
             cat demo-cluster/.k8s-gen/manifests.yaml
           } > "$PROMPT_FILE"
 
