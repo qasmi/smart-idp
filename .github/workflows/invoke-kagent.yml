@@ -24,7 +24,7 @@ jobs:
             git push origin HEAD:${{ github.ref_name }}
           else
             echo "No changes to commit."
-            exit 1
+            exit 78
           fi
 
       - name: Install KAgent
