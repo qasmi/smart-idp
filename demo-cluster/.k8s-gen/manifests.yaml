@@ -11,6 +11,12 @@ kind: Namespace
 metadata:
   name: kagent
 ---
+# Source: gitops-chart/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kmcp-systems
+---
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -24,6 +30,8 @@ spec:
       namespace: argocd
     - server: https://kubernetes.default.svc
       namespace: kagent
+    - server: https://kubernetes.default.svc
+      namespace: kmcp-systems
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
     - server: https://kubernetes.default.svc
