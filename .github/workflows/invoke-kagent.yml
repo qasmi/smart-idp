@@ -46,7 +46,9 @@ jobs:
             
             RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
             | jq -r '.artifacts[0].parts[0].text')
-
+            echo "response<<EOF" >> $GITHUB_OUTPUT
+            echo "$RESPONSE" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
           else
             echo "No changes to commit."
           fi
