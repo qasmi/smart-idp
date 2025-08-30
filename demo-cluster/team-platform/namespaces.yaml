@@ -5,6 +5,6 @@ namespaces:
   kagent:
     owner: platform
     project: platform
-  kmcp-systems:
+  kmcp-system:
     owner: platform
     project: platform
