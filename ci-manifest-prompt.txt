@@ -1,3 +1,4 @@
+Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:
 ---
 # Source: gitops-chart/templates/namespace.yaml
 apiVersion: v1
@@ -173,18 +174,3 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: hello
-  namespace: notexist
-spec:
-  template:
-    # This is the pod template
-    spec:
-      containers:
-      - name: hello
-        image: busybox:1.28
-        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
-      restartPolicy: OnFailure
