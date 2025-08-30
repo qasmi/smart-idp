@@ -1,7 +1,7 @@
-name: Invoke KAgent
+name: GioOps semantic validation
 
 on:
-  pull_request:
+  push:
     branches:
       - 'feat/*'
 
@@ -49,7 +49,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Add PR comment
-        uses: peter-evans/create-or-update-comment@v4
+        uses: kagent/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
@@ -57,4 +57,3 @@ jobs:
             ```
             ${{ steps.kagent.outputs.response }}
             ```
-        
