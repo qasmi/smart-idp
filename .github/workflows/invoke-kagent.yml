@@ -16,12 +16,14 @@ jobs:
 
       - name: Generate Manifests
         run: |
-          cd demo-cluster
-          make
-          cd ..
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git checkout ${{ github.head_ref }}
+          
+          cd demo-cluster
+          make
+          cd ..
 
           git add ./demo-cluster/.k8s-gen/
           if ! git diff --cached --quiet; then
