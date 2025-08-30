@@ -6,6 +6,8 @@ on:
 jobs:
   invoke-kagent:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
 
     steps:
       - name: Checkout repository
@@ -50,17 +52,8 @@ jobs:
         uses: mshick/add-pr-comment@v2
         with:
           message: |
-            **Hello**
-            🌏
-            !
-
-      #  if: env.PR_NUMBER
-      #  uses: peter-evans/create-or-update-comment@v4
-      #  with:
-      #    issue-number: ${{ env.PR_NUMBER }}
-      #    body: |
-      #      🤖 **KAgent Analysis**
-      #      Triggered by: ${{ github.actor }}
-      #      ```
-      #      ${{ steps.kagent.outputs.response }}
-      #      ```
+            🤖 **KAgent Analysis**
+            Triggered by: ${{ github.actor }}
+            ```
+            ${{ steps.kagent.outputs.response }}
+            ```
