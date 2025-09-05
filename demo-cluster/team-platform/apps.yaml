@@ -39,13 +39,3 @@
   valueFiles: []
   autoSync:
     enabled: true
-- name: cert-manager
-  owner: platform
-  project: platform
-  namespace: test
-  repo: https://charts.jetstack.io
-  chart: cert-manager
-  version: "*"
-  valueFiles: []
-  autoSync:
-    enabled: true
