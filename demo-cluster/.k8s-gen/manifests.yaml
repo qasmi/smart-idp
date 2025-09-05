@@ -61,11 +61,8 @@ metadata:
 spec:
   description: Project security
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: kyverno
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
-    - https://kyverno.github.io/kyverno
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
