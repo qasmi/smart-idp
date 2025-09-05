@@ -32,13 +32,10 @@ spec:
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
-    - server: https://kubernetes.default.svc
-      namespace: test
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
     - ghcr.io/kagent-dev/kmcp/helm
-    - https://charts.jetstack.io
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
@@ -64,8 +61,11 @@ metadata:
 spec:
   description: Project security
   destinations:
+    - server: https://kubernetes.default.svc
+      namespace: kyverno
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
+    - https://kyverno.github.io/kyverno
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding
