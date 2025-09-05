@@ -5,9 +5,6 @@ namespaces:
   kagent:
     owner: platform
     project: platform
-  kyverno:
-    owner: platform
-    project: security
   kmcp-system:
     owner: platform
     project: platform

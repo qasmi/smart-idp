@@ -1,30 +1,68 @@
-name: Invoke KAgent
+name: GioOps semantic validation
 
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 
 jobs:
   invoke-kagent:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: requirements
+      - name: Generate Manifests
         run: |
-          curl https://raw.githubusercontent.com/kagent-dev/kagent/refs/heads/main/scripts/get-kagent | bash
-        
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          git fetch origin ${{ github.head_ref }} 
+          git checkout -B ${{ github.head_ref }} origin/${{ github.head_ref }}
+
+          cd demo-cluster
+          make || exit 1
+          cd ..
+
+          git add ./demo-cluster/.k8s-gen/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: auto-update manifests [ci skip]"
+            git push origin ${{ github.head_ref }} -o ci.skip
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Install KAgent
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
+
+      - name: Build prompt file
+        run: |
           PROMPT_FILE="./ci-manifest-prompt.txt"
-          cat > "$PROMPT_FILE" <<EOF
-          Compare the live state of the cluster with the following manifest. Briefly summarize any misconfigurations or risks that would occur if the manifest is applied. Focus only on real diffs that affect resources, and give very short answers:
-          $(< demo-cluster/.k8s-gen/manifests.yaml)
-          EOF
+          {
+            echo "Compare the live state of the cluster with the following manifest (don't provide details about the diff). Briefly summarize any misconfigurations or risks that would occur if the manifest is applied (as simple as you can for a developer). Focus only on real diffs that affect resources, and give very short answers:"
+            cat demo-cluster/.k8s-gen/manifests.yaml
+          } > "$PROMPT_FILE"
 
       - name: Invoke KAgent
+        id: kagent
         run: |
           PROMPT_FILE="./ci-manifest-prompt.txt"
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file $PROMPT_FILE  \
-          | jq -r '.artifacts[0].parts[0].text'
+          RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
+          | jq -r '.artifacts[0].parts[0].text')
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Add PR comment
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            Triggered by: Kagent 🤖
+            ```
+            ${{ steps.kagent.outputs.response }}
+            ```

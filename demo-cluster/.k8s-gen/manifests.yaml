@@ -17,12 +17,6 @@ kind: Namespace
 metadata:
   name: kmcp-system
 ---
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kyverno
----
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -70,8 +64,6 @@ metadata:
 spec:
   description: Project security
   destinations:
-    - server: https://kubernetes.default.svc
-      namespace: kyverno
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
   clusterResourceWhitelist:
@@ -173,18 +165,3 @@ spec:
         {{- end }}
     {{- end }}
     {{- end }}
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: hello
-  namespace: notexist
-spec:
-  template:
-    # This is the pod template
-    spec:
-      containers:
-      - name: hello
-        image: busybox:1.28
-        command: ['sh', '-c', 'echo "Hello, Kubernetes!" && sleep 3600']
-      restartPolicy: OnFailure
