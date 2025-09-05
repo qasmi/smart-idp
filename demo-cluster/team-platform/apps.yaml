@@ -39,13 +39,13 @@
   valueFiles: []
   autoSync:
     enabled: true
-- name: cert-manager
+- name: kyverno
   owner: platform
-  project: platform
-  namespace: test
-  repo: https://charts.jetstack.io
-  chart: cert-manager
-  version: "*"
+  project: security
+  namespace: kyverno
+  repo: https://kyverno.github.io/kyverno
+  chart: kyverno
+  version: 3.4.*
   valueFiles: []
   autoSync:
     enabled: true
