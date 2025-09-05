@@ -11,12 +11,6 @@ kind: Namespace
 metadata:
   name: kagent
 ---
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kmcp-system
----
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
