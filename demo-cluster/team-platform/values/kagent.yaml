@@ -5,12 +5,10 @@ providers:
     model: "gpt-4.1-mini"
     apiKeySecretRef: kagent-openai
     apiKeySecretKey: OPENAI_API_KEY
-
 database:
   type: sqlite
   sqlite:
     databaseName: kagent.db
-
 controller:
   replicas: 1
   loglevel: "info"
@@ -29,7 +27,6 @@ controller:
     ports:
       port: 8083
       targetPort: 8083
-
 ui:
   replicas: 1
   resources:
@@ -45,7 +42,6 @@ kagent-tools:
   replicaCount: 1
   tools:
     loglevel: "debug"
-
 agents:
   k8s-agent:
     enabled: true
@@ -60,20 +56,18 @@ agents:
   argo-rollouts-agent:
     enabled: false
   helm-agent:
-    enabled: false
+    enabled: true
   cilium-policy-agent:
-    enabled: false
+    enabled: true
   cilium-manager-agent:
-    enabled: false
+    enabled: true
   cilium-debug-agent:
-    enabled: false
-
+    enabled: true
 querydoc:
   enabled: true
   replicas: 1
   openai:
     apiKey: ""
-
 otel:
   tracing:
     enabled: false
