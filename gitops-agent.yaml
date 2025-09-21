@@ -1,0 +1,51 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: composite-agent
+  namespace: kagent
+spec:
+  type: Declarative
+  description: "Composite agent that delegates tasks to k8s-agent and cilium-debug-agent"
+  declarative:
+    systemMessage: |
+      You are CompositeAgent. Your role is to orchestrate and delegate tasks
+      to the k8s-agent and cilium-debug-agent. When given a query:
+      - For Kubernetes cluster management, troubleshooting, and diagnostics, use k8s-agent.
+      - For Cilium networking and debugging, use cilium-debug-agent.
+      Always combine their results and provide a unified response.
+    modelConfig: default-model-config
+    a2aConfig:
+      skills:
+        - id: cluster-orchestration
+          name: Cluster Orchestration
+          description: Delegate Kubernetes tasks to k8s-agent.
+          tags: 
+            - cluster
+            - diagnostics
+            - resource
+            - management
+            - security
+            - audit
+          examples:
+            - "Check the status of all nodes in the cluster."
+            - "Scale deployment X to 5 replicas."
+        - id: cilium-debugging
+          name: Cilium Debugging
+          description: Delegate network debugging tasks to cilium-debug-agent.
+          tags: 
+            - cilium
+            - redirect
+          examples:
+            - "Check Cilium connectivity for namespace Y."
+            - "Retrieve network policies applied to pod Z."
+    tools:
+      - type: Agent
+        agent:
+          apiGroup: kagent.dev/v1alpha2
+          kind: Agent
+          name: k8s-agent
+      - type: Agent
+        agent:
+          apiGroup: kagent.dev/v1alpha2
+          kind: Agent
+          name: cilium-debug-agent
