@@ -36,33 +36,7 @@ jobs:
       #      echo "No changes to commit."
       #    fi
 
-      - name: Install KAgent
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
-
-      - name: Build prompt file
-        run: |
-          PROMPT_FILE="./ci-manifest-prompt.txt"
-          {
-            echo "Compare the live state of the cluster with the following manifest (don't provide details about the diff). Briefly summarize any misconfigurations or risks that would occur if the manifest is applied (as simple as you can for a developer). Focus only on real diffs that affect resources, and give very short answers:"
-            cat demo-cluster/.k8s-gen/manifests.yaml
-          } > "$PROMPT_FILE"
-
       - name: Invoke KAgent
         id: kagent
         run: |
-          PROMPT_FILE="./ci-manifest-prompt.txt"
-          RESPONSE=$(kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent k8s-agent --file "$PROMPT_FILE" \
-          | jq -r '.artifacts[0].parts[0].text')
-          echo "response<<EOF" >> $GITHUB_OUTPUT
-          echo "$RESPONSE" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Add PR comment
-        uses: mshick/add-pr-comment@v2
-        with:
-          message: |
-            Triggered by: Kagent 🤖
-            ```
-            ${{ steps.kagent.outputs.response }}
-            ```
+          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent gitops-v3-agent --file demo-cluster/.k8s-gen/manifests.yaml
