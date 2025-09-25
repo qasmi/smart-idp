@@ -38,6 +38,7 @@ jobs:
 
       - name: Install KAgent
         run: |
+          export DESIRED_VERSION=v0.4.5
           curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/v0.4.5/scripts/get-kagent | bash
 
       - name: Build prompt file
