@@ -14,7 +14,7 @@
   namespace: kagent
   repo: ghcr.io/kagent-dev/kagent/helm
   chart: kagent
-  version: "0.6.14"
+  version: "0.6.15"
   valueFiles:
     - kagent.yaml
   autoSync:

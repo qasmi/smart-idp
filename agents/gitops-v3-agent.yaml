@@ -13,22 +13,25 @@ spec:
         name: Manifest Diagnostics
         description: Analyze and validate GitOps manifests against the live cluster state.
         examples:
-          - What is the difference between the desired and live state of the cluster?
+          - Calculate is the difference between the desired and live state of the cluster?
+          - Are there any configuration conflicts between resources in the manifest?
           - Is my desired manifest safe to apply to the live cluster?
-          - Are there any configuration conflicts between resources in the desired GitOps state?
         tags:
           - cluster
           - diagnostics
           - gitops
           - manifest
+          - gitops
+          - kubernetes
 
       - id: resource-management
         name: Resource Management
-        description: Identify and resolve conflicts between desired manifests and live cluster resources.
+        description: Identify conflicts and misconfigurations between desired manifests and live cluster resources.
         examples:
-          - What configuration conflicts exist between my desired manifest and live cluster resources?
-          - Could a misconfiguration in my desired manifest break the cluster or workloads?
-          - How do I fix a detected misconfiguration?
+          - What configuration conflicts exist between the gitops desired manifest resources and live cluster resources?
+          - Identify the misconfiguration in the gitops desired manifest base on the live state of the cluster
+          - Could a misconfiguration in the gitops desired manifest resouces break the cluster or workloads currently running?
+          - How do I fix a the misconfigurations?
         tags:
           - resource
           - management

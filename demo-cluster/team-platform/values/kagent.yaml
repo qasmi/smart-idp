@@ -58,11 +58,11 @@ agents:
   helm-agent:
     enabled: false
   cilium-policy-agent:
-    enabled: true
+    enabled: false
   cilium-manager-agent:
-    enabled: true
+    enabled: false
   cilium-debug-agent:
-    enabled: true
+    enabled: false
 querydoc:
   enabled: true
   replicas: 1

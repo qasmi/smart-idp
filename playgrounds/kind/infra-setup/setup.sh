@@ -14,4 +14,36 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-sudo systemctl status docker
+#sudo systemctl status docker
+
+curl -fsSL https://get.jetify.com/devbox | bash
+
+devbox run setup
+
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
+
+
+# 1. Download the latest release for Linux AMD64
+curl -s https://api.github.com/repos/derailed/k9s/releases/latest \
+| grep "browser_download_url.*Linux_amd64.tar.gz" \
+| cut -d '"' -f 4 \
+| wget -qi -
+
+# 2. Extract the archive (replace X.Y.Z with the version downloaded)
+tar -xvf k9s_Linux_amd64.tar.gz
+
+# 3. Move the binary to a location in PATH
+sudo mv k9s /usr/local/bin/
+
+# 4. Verify installation
+k9s version
+
+
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main" | sudo tee /etc/apt/sources.list.d/cloudflared.list
+sudo apt-get update && sudo apt-get install cloudflared
