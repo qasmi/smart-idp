@@ -1,6 +1,7 @@
 apiVersion: v1
 stringData:
   GITHUB_PERSONAL_ACCESS_TOKEN: $GITHUB_PERSONAL_ACCESS_TOKEN
+  GITHUB_TOOLSETS: "repos,issues,pull_requests,actions,code_security,experiments"
 kind: Secret
 metadata:
   name: github-mcp-secret
@@ -15,14 +16,10 @@ metadata:
 spec:
   deployment:    
     args:
-    - 'github-mcp-server --toolsets pull_requests'
-    env:
-      - name: GITHUB_PERSONAL_ACCESS_TOKEN
-        valueFrom:
-          secretRefs: 
-            name: github-mcp-secret
-      - name: GITHUB_TOOLSETS
-        value: "repos,issues,pull_requests,actions,code_security,experiments"
+    - 'stdio'
+    cmd: "/server/github-mcp-server"
     image: ghcr.io/github/github-mcp-server
     port: 3000
+    secretRefs:
+    - name: github-mcp-secret
   transportType: stdio
