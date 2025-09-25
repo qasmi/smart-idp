@@ -38,7 +38,7 @@ jobs:
 
       - name: Install KAgent
         run: |
-          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
+          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/v0.4.5/scripts/get-kagent | bash
 
       - name: Invoke KAgent
         id: kagent
