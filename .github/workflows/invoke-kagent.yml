@@ -36,6 +36,10 @@ jobs:
       #      echo "No changes to commit."
       #    fi
 
+      - name: Install KAgent
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
+
       - name: Invoke KAgent
         id: kagent
         run: |
