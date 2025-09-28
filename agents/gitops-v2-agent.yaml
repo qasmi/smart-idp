@@ -8,7 +8,7 @@ spec:
   description: An GitOps and ArgoCD based Kubernetes Expert AI Agent specializing in cluster operations, troubleshooting, and maintenance.  
   declarative:
     a2aConfig:
-    skills:
+      skills:
       - id: manifest-diagnostics
         name: Manifest Diagnostics
         description: Analyze and validate GitOps manifests against the live cluster state.

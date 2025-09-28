@@ -24,8 +24,8 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 chmod +x kubectl
 sudo mv kubectl /usr/local/bin/
 
-curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/main/scripts/get-kagent | bash
-
+export DESIRED_VERSION=v0.4.5
+curl -fsSL https://raw.githubusercontent.com/kagent-dev/kagent/v0.4.5/scripts/get-kagent | bash
 
 # 1. Download the latest release for Linux AMD64
 curl -s https://api.github.com/repos/derailed/k9s/releases/latest \
