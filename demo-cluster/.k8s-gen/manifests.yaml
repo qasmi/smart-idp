@@ -163,3 +163,15 @@ spec:
     {{- end }}
     {{- end }}
 
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  namespace: nonexist
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
