@@ -39,3 +39,13 @@
   valueFiles: []
   autoSync:
     enabled: true
+- name: test-app
+  owner: platform
+  project: platform
+  namespace: test-app
+  repo: ghcr.io/stapr-idp
+  chart: test-app
+  version: "*"
+  valueFiles: []
+  autoSync:
+    enabled: true
