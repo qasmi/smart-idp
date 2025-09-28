@@ -80,88 +80,145 @@ spec:
     - group: apiregistration.k8s.io
       kind: APIService
 ---
-# Source: gitops-chart/templates/applicationSet.yaml
+# Source: gitops-chart/templates/application.yaml
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  annotations: {}
-  name: platform-apps
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 0
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  goTemplate: true
-  generators:
-    - git:
-        repoURL: https://github.com/qasmi/smart-idp.git
-        revision: HEAD
-        files:
-          - path: "demo-cluster/team-platform/apps.yaml"
-  template:
-    metadata:
-      name: '{{ .name }}'
-      namespace: argocd
-      annotations:
-        argocd.argoproj.io/sync-wave: '{{ .syncWave | default "10" }}'
-      finalizers:
-        - "resources-finalizer.argocd.argoproj.io"
-    spec:
-      project: '{{ .project }}'
-      revisionHistoryLimit: 3
-      sources:
-      - repoURL: https://github.com/qasmi/smart-idp.git
-        targetRevision: HEAD
-        ref: valuesRef
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: '{{ .namespace }}'
-  templatePatch: |
-    spec:
-      sources:
-        - chart: '{{ .chart }}'
-          repoURL: '{{ .repo }}'
-          targetRevision: '{{ .version }}'
-          helm:
-            valueFiles:
-            {{- range .valueFiles }}
-              - $valuesRef/demo-cluster/team-platform/values/{{ . }}
-            {{- end }}
-        - repoURL: 'https://github.com/qasmi/smart-idp.git'
-          targetRevision: 'HEAD'
-          path: demo-cluster/team-platform/values
-          ref: valuesRef
-    {{- if .autoSync }}
-      syncPolicy:
-        automated:
-          prune: {{ .autoSync.enabled }}
-          selfHeal: {{ .autoSync.enabled }}
-        {{- if .autoSync.syncOptions }}
-        syncOptions:
-        {{- range .autoSync.syncOptions }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
-    {{- if .ignoreDifferences }}
-      ignoreDifferences:
-    {{- range .ignoreDifferences }}
-      - group: {{ .group }}
-        kind: {{ .kind }}
-        {{- if .name }}
-        name: {{ .name }}
-        {{- end }}
-        {{- if .namespace }}
-        namespace: {{ .namespace }}
-        {{- end }}
-        {{- if .jsonPointers }}
-        jsonPointers:
-        {{- range .jsonPointers }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-        {{- if .jqPathExpressions }}
-        jqPathExpressions:
-        {{- range .jqPathExpressions }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
-    {{- end }}
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kagent/helm
+    chart: kagent-crds
+    targetRevision: "*"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kagent
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 1
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kagent/helm
+    chart: kagent
+    targetRevision: "0.6.15"
+    helm:
+      valueFiles:
+        - team-platform/values/kagent.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kagent
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 2
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kmcp/helm
+    chart: kmcp-crds
+    targetRevision: "*"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kmcp-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 3
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kmcp/helm
+    chart: kmcp
+    targetRevision: "*"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kmcp-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 4
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/stapr-idp
+    chart: test-app
+    targetRevision: "*"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: test-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []

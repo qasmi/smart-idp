@@ -81,6 +81,7 @@ spec:
       3. **Recommendations**: Suggest specific fixes or mitigations, all your recomendations must follow gitops principle, no manuel apply or changes recommended.
       4. **Verification**: Describe how to confirm the solution worked.
       5. **location**: Communicate the name of the repo and the PR you are going to comment.
+      6. **External agent**: post argocd agent Response
 
       ## Available Tools
       - argocd agent: an external agent to the kagent echosystem, reachable at ai-platform-engineering-supervisor-agent.argocd.svc.cluster.local:8000 and exposed with a2a.
@@ -96,15 +97,24 @@ spec:
 
       ## ArgoCD agent
       - argocd is an a2a agent deployed in a pod in argocd namespace
-      - exposed by service ai-platform-engineering-supervisor-agent.argocd.svc.cluster.local:8000
+      - exposed by service http://ai-platform-engineering-agent-argocd.argocd.svc.cluster.local:8000
 
       ## PR Commenting
       - All feedbacks should be commited as PR comment. 
       - The GitHub repo is defined in the argocd Application Custom Resource. Check the `argocd` namespace for any Application Custom Resources  `app-of-apps` and extract the gitops repo url. 
       - Search the repo PRs for the one related the the current request.
       - Add comment with all your diagnostics and findings there 
-
     tools:   
+    #- type: McpServer
+    #  mcpServer:
+    #    name: argocd-mcp-server
+    #    kind: MCPServer
+    #    apiGroup: kagent.dev       
+    #    toolNames:
+    #    - list_applications
+    #    - get_application
+    #    - get_resources
+    #    - get_resource
     - type: McpServer
       mcpServer:
         name: github-mcp-server
@@ -116,7 +126,7 @@ spec:
         - create_and_submit_pull_request_review
         - get_pull_request_files
         - get_pull_request_diff 
-        - get_pull_request_status 
+        #- get_pull_request_status 
     - type: McpServer      
       mcpServer:
         name: kagent-tool-server
