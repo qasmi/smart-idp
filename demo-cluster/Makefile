@@ -22,7 +22,6 @@ generate:
 	cat global.yaml >> $(CONFIG)
 
 	@echo "Rendering Helm template..."
-	cp -rf ./team-*/values $(PATH_DIR)
 	helm template ../gitops-chart --values $(CONFIG) > $(OUTPUT)
 
 	@echo "Manifests generated at $(OUTPUT)"

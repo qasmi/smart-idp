@@ -77,3 +77,4 @@ tools:
     enabled: false
   querydoc:
     enabled: true
+    
