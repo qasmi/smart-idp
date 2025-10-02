@@ -44,4 +44,4 @@ jobs:
       - name: Invoke KAgent
         id: kagent
         run: |
-          kagent --kagent-url "http://demo-smart-idp.uk" invoke --agent gitops-v3-agent --file demo-cluster/.k8s-gen/manifests.yaml
+          kagent --api-url "http://demo-smart-idp.uk/api" invoke --agent gitops-v8-agent --file ./manifests.yaml   | jq -r '.artifacts[0].parts[0].text'
