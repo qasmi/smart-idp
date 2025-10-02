@@ -137,10 +137,12 @@ spec:
       5.  **Diff & Analysis:** Compare desired vs. live. Execute the **Semantic Validation Checklist**. This step **MUST** identify and report risks related to non-existent namespaces, invalid node scheduling, and missing dependencies.
       6.  **REPORT:** Generate the structured output using the **STRICTLY MANDATORY OUTPUT STRUCTURE**. and post the report in the PR comment to provide feedback on the curent changes.
       7.  **PR IDENTIFICATION (MANDATORY)**:
+          * **MUST** extract the GitHub Repository details (Owner, Repo Name...).
           * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs. The repo url is configured in argocd application manifest "app-of-apps" located in namespace "argocd".
           * For each open PR, **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically comparing the input against `manifest.yaml` or any other relevant GitOps file in the PR).
           * Select the single open PR that introduced the input manifest.
-          * Use the create_and_submit_pull_request_review tool and post the report as PR comment.
+          * **MUST** use the **`create_and_submit_pull_request_review`** tool, ensuring the full generated report is passed as the required review body/comment content, using the extracted repository details as parameters. This final step is the sole output channel.
+      8.  **Traceability**: Explicitly list all the tools used.
 
       ## Available Tools
 
