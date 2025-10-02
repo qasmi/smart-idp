@@ -19,13 +19,13 @@ spec:
           - "What resources will be created, modified, or deleted if I merge this PR?"
           - "Are there any conflicts between the GitOps manifest and the live cluster?"
           - "Does this manifest violate RBAC, quotas, or namespace policies?"
-        tags: 
+        tags:
           - gitops
           - diff
           - validation
           - argocd
           - kubernetes
-  
+
       - id: impact-analysis
         name: Advanced Impact Analysis
         description: Perform deep semantic checks to detect indirect dependencies, compliance issues, and risks.
@@ -33,7 +33,7 @@ spec:
           - "Could applying this manifest disrupt workloads currently running in the cluster?"
           - "Detect second-level dependencies and hidden risks from these changes."
           - "Summarize cluster-wide impact of merging this PR."
-        tags: 
+        tags:
           - analysis
           - compliance
           - risk
@@ -58,7 +58,7 @@ spec:
         - **argocd expertise**: Use argocd tools to analysis Gitops manifest resources and identify external dependencies sutch as helm charts, values...
         - **Find deep links**: use helm tools to rendre the identifiyed helm charts using the coresponding values to descuver the underlying kubernetes resource. For example if an argocd application is using a specific helm chart, rendre the helm chart with the values provided in application spec and list the kubernetes resources  (pods, deployments, service, serviceaccount ...) that will be created by this chart if we apply the manifest.
         - **State Comparison & Validation**
-          - Gather all the previous finds and start analysing the impct of the resources on the curent live cluster 
+          - Gather all the previous finds and start analysing the impct of the resources on the curent live cluster
           - Use Kubernetes tools in read-only mode to inspect live cluster state for each resource from the gitops manifest.
           - Identify conflicts, missing dependencies (namespaces, CRDs, RBAC), quota issues, version mismatches.
           - Identify the real diff (add, modification or deletion) between the gitops manifest and the live state of the cluster.
@@ -95,17 +95,17 @@ spec:
         - Explicitly never perform `apply`, `sync`, `install`, `uinstall`, or changes via ArgoCD or helm without --dry-run option. if the option is not availible don't perform the operation.
 
         ## PR Commenting
-        - All feedbacks should be commited as PR comment. 
+        - All feedbacks should be commited as PR comment.
         - Use this repo to post your comment, https://github.com/qasmi/smart-idp.git
         - Search the repo PRs for the one related the the current request.
-        - Add comment with all your diagnostics and findings there 
+        - Add comment with all your diagnostics and findings there
 
     tools:
     - type: McpServer
       mcpServer:
         name: argocd-mcp-server
         kind: MCPServer
-        apiGroup: kagent.dev       
+        apiGroup: kagent.dev
         toolNames:
         - get_application_details
         - application_service__managed_resources
@@ -117,14 +117,14 @@ spec:
       mcpServer:
         name: github-mcp-server
         kind: MCPServer
-        apiGroup: kagent.dev       
+        apiGroup: kagent.dev
         toolNames:
         - get_pull_request
         - list_pull_requests
         - create_and_submit_pull_request_review
         - get_pull_request_files
-        - get_pull_request_diff 
-        - get_pull_request_status 
+        - get_pull_request_diff
+        - get_pull_request_status
     - type: McpServer
       mcpServer:
         name: kagent-tool-server
