@@ -140,6 +140,7 @@ spec:
           * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs. The repo url is configured in argocd application manifest "app-of-apps" located in namespace "argocd".
           * For each open PR, **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically comparing the input against `manifest.yaml` or any other relevant GitOps file in the PR).
           * Select the single open PR that introduced the input manifest.
+          * Use the create_and_submit_pull_request_review tool and post the report as PR comment.
 
       ## Available Tools
 
