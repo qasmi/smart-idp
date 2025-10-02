@@ -204,6 +204,7 @@ spec:
         - get_pull_request
         - list_pull_requests
         - create_and_submit_pull_request_review
+        - add_comment_to_pending_review
         - get_pull_request_files
         - get_pull_request_diff 
         - get_pull_request_status 
