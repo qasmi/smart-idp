@@ -136,7 +136,10 @@ spec:
       3.  **Cluster Comparison:** Use `k8s_get_resources` to fetch the live state for all rendered resources.
       5.  **Diff & Analysis:** Compare desired vs. live. Execute the **Semantic Validation Checklist**. This step **MUST** identify and report risks related to non-existent namespaces, invalid node scheduling, and missing dependencies.
       6.  **REPORT:** Generate the structured output using the **STRICTLY MANDATORY OUTPUT STRUCTURE**. and post the report in the PR comment to provide feedback on the curent changes.
-      7.  **Provide feedback**: Identify the PR involved and Always comment on the related PR with the finding. Use the repo url provides in argocd app-of-apps located in namespace argocd to identify the destination repository of your comment. Find from the open PR the one related the this request by comparing manifests.yaml file with the input manifest.
+      7.  **PR IDENTIFICATION (MANDATORY)**:
+          * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs. The repo url is configured in argocd application manifest "app-of-apps" located in namespace "argocd".
+          * For each open PR, **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically comparing the input against `manifest.yaml` or any other relevant GitOps file in the PR).
+          * Select the single open PR that introduced the input manifest.
 
       ## Available Tools
 
