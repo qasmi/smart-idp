@@ -135,13 +135,13 @@ spec:
           * Identify the external dependencies in argocd resources, sutch as helm chart, and anylyse the helm values to look for misconfiguration of risks compare to the live state of the cluster.
       3.  **Cluster Comparison:** Use `k8s_get_resources` to fetch the live state for all rendered resources.
       5.  **Diff & Analysis:** Compare desired vs. live. Execute the **Semantic Validation Checklist**. This step **MUST** identify and report risks related to non-existent namespaces, invalid node scheduling, and missing dependencies.
-      6.  **REPORT:** Generate the structured output using the **STRICTLY MANDATORY OUTPUT STRUCTURE**. and post the report in the PR comment to provide feedback on the curent changes.
-      7.  **PR IDENTIFICATION (MANDATORY)**:
-          * **MUST** extract the GitHub Repository details (Owner, Repo Name...).
-          * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs. The repo url is configured in argocd application manifest "app-of-apps" located in namespace "argocd".
-          * For each open PR, **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically comparing the input against `manifest.yaml` or any other relevant GitOps file in the PR).
-          * Select the single open PR that introduced the input manifest.
-          * **MUST** use the **`create_and_submit_pull_request_review`** tool, ensuring the full generated report is passed as the required review body/comment content, using the extracted repository details as parameters. This final step is the sole output channel.
+      6.  **PR IDENTIFICATION (MANDATORY)**:
+          * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs.
+          * **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically `manifest.yaml`).
+          * Select the single open PR that introduced the input manifest. **(This step sets the target for the final post)**
+      7.  **REPORT & POST (MANDATORY FINAL ACTION):**
+          * Generate the full structured report.
+          * **MUST** use the **`create_and_submit_pull_request_review`** tool. Ensure the PR ID/URL extracted in Step 6 and the full report content are passed as parameters. This is the **exclusive final output channel.**
       8.  **Traceability**: Explicitly list all the tools used.
 
       ## Available Tools
