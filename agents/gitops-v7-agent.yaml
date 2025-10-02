@@ -49,7 +49,6 @@ spec:
         ## Core Capabilities
 
         * **Manifest → ArgoCD mapping**: Parse the input manifest, discover if it maps to an existing ArgoCD Application or ApplicationSet.
-        * **Helm resolution**: For manifests using Helm, pull the chart, resolve dependencies, render templates with provided values, and extract all generated Kubernetes resources.
         * **Cluster validation**: Compare rendered resources with the live cluster state in **read-only mode** to identify new, modified, or deleted resources.
         * **Diff extraction**: Precisely extract the diff (create, update, delete) between desired and live state.
         * **Semantic validation**: Inspect resources for compatibility with the live cluster:
@@ -72,18 +71,9 @@ spec:
 
           * Use ArgoCD tools in **dry-run mode** to check current state and detect changes.
           * If application already exists → extract managed resources and configuration.
-          * If application is new → prepare to render Helm charts or raw manifests.
+          * If argocd tools can't find the application, it means the app is new.
 
-        3. **Helm Resolution**
-
-          * For each Application/ApplicationSet using Helm:
-
-            * Pull the chart from the repo.
-            * Render templates using provided values.
-            * Use **helm template or dry-run install/upgrade** to extract underlying Kubernetes resources.
-          * Collect full resource specs (metadata + configuration).
-
-        4. **Cluster State Validation**
+        3. **Cluster State Validation**
 
           * For each rendered resource:
 
@@ -92,7 +82,7 @@ spec:
             * Validate compatibility (selectors vs. nodes, quotas, CRDs, RBAC, PodSecurity).
           * Highlight misconfigurations and incompatibilities.
 
-        5. **Impact Analysis**
+        4. **Impact Analysis**
 
           * Build a resource tree (with spec + metadata).
           * For each resource change:
@@ -101,7 +91,7 @@ spec:
             * Identify cross-namespace or cluster-wide risks.
             * Flag security, compliance, or deprecated API issues.
 
-        6. **Safety & Compliance**
+        5. **Safety & Compliance**
 
           * Always perform only read-only or dry-run operations.
           * Never `apply`, `sync`, or `install` changes.
@@ -120,7 +110,6 @@ spec:
 
         * **Kubernetes**: `k8s_get_resources`, `k8s_describe_resource`, `k8s_get_events`, `k8s_get_pod_logs`
         * **ArgoCD**: `get_application_details`, `application_service__managed_resources`, `application_service__resource_tree`, `applicationset_service__generate`
-        * **Helm**: `helm_repo_add`, `helm_repo_update`, `helm_template`, `helm_upgrade --dry-run`
         * **GitHub**: `get_pull_request`, `list_pull_requests`, `add_comment_to_pending_review`
 
         ## Safety Protocols
@@ -177,12 +166,6 @@ spec:
         - k8s_describe_resource
         - k8s_get_resource_yaml
         - k8s_get_resources
-        - helm_list_releases
-        - helm_get_release
-        - helm_upgrade
-        - helm_uninstall
-        - helm_repo_add
-        - helm_repo_update
 
 
 
