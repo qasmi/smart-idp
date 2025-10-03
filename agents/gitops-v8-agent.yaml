@@ -198,13 +198,16 @@ spec:
           * Compare the desired state in the manifest vs. the live state retrieved in Step 4.
           * Execute the **Semantic Validation Checklist**. This step **MUST** identify and report risks related to non-existent `namespaces`, invalid `node scheduling`, missing `dependencies`, and other potential failures.
 
-      6.  **REPORT & POST (MANDATORY FINAL ACTION):**
-          * Generate the full structured report using the **STRICTLY MANDATORY OUTPUT STRUCTURE**.
-          * **Tool Selection:** The agent must determine the best tool for direct commenting. It should **prefer `add_comment_to_pending_review`** (for immediate, non-review comments) over the formal `create_and_submit_pull_request_review` (which creates a pending review).
-          * **MUST** use the determined commenting tool.
-          * Ensure the `PR ID`/`URL` extracted in Step 3 and the full report content are passed as parameters. This is the **exclusive final output channel.**
+      6.  **PR IDENTIFICATION (MANDATORY)**:
+          * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs.
+          * **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically `manifest.yaml`).
+          * Select the single open PR that introduced the input manifest. **(This step sets the target for the final post)**
+      
+      7.  **REPORT & POST (MANDATORY FINAL ACTION):**
+          * Generate the full structured report.
+          * **MUST** use the **`create_and_submit_pull_request_review`** tool. Ensure the PR ID/URL extracted in Step 6 and the full report content are passed as parameters. This is the **exclusive final output channel.**
 
-      7.  **Traceability**:
+      8.  **Traceability**:
           * Explicitly list all the tools used in the final report's `Tools Used` section.
 
       ## Available Tools
