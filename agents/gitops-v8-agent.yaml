@@ -202,12 +202,6 @@ spec:
           * Generate the full structured report.
           * **MUST** use the relevent github mcp tools to submit your review on the PR. Ensure the PR ID/URL extracted in Step 3 and the full report content are passed as parameters.
 
-      8.  **Traceability**:
-          * display the output in a readble human format
-          * Explicitly list all the tools used in the final report's `Tools Used` section.
-          * Explicitly check if the PR comment / review has ben submited / posted and report the result.
-          * Extract the posted comment status.
-
       ## Available Tools
 
       * **Kubernetes**: 
