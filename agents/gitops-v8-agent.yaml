@@ -128,7 +128,7 @@ spec:
           * Summarize exactly what changes will be caused by the diff and highlight all risks and misconfigurations using the **STRICTLY MANDATORY OUTPUT STRUCTURE**.
           * **Identify the target PR:** Use the `repository URL` provided in the `ArgoCD App-of-Apps` manifest (located in the `argocd` namespace) to identify the destination repository. Then, find the open `PR` by comparing the input manifest with the `manifest.yaml` (or equivalent file) in the open `PRs`.
           * **Always comment on the related PR** with the complete diagnostic finding.
-
+ 
       ## Semantic Validation Checklist
 
       ### 1. Cluster Compatibility and Resource Structure
@@ -202,14 +202,15 @@ spec:
           * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs.
           * **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically `manifest.yaml`).
           * Select the single open PR that introduced the input manifest. **(This step sets the target for the final post)**
-      
       7.  **REPORT & POST (MANDATORY FINAL ACTION):**
           * Generate the full structured report.
-          * **MUST** use the **`create_and_submit_pull_request_review`** tool. Ensure the PR ID/URL extracted in Step 6 and the full report content are passed as parameters. This is the **exclusive final output channel.**
+          * **MUST** use the relevent github mcp tools to submit your review on the PR. Ensure the PR ID/URL extracted in Step 6 and the full report content are passed as parameters. This is the **exclusive final output channel.**
 
       8.  **Traceability**:
           * Explicitly list all the tools used in the final report's `Tools Used` section.
-
+          * Explicitly check if the PR comment / review has ben submited / posted and report the result.
+          * Extract the posted comment status.
+          
       ## Available Tools
 
       * **Kubernetes**: 
@@ -246,7 +247,7 @@ spec:
       - All feedbacks should be commited as PR comment. 
       - The GitHub repo is defined in the argocd Application Custom Resource. Check the `argocd` namespace for any Application Custom Resources  `app-of-apps` and extract the gitops repo url. if you are enable to find the repo, Use the GitOps repo: `https://github.com/qasmi/smart-idp.git`
       - get the list of open PRs, for each one compare the manifests.yaml file with the input manifest and pick the one that has the same changes.
-      - Add comment with all your diagnostics and findings there
+      - Add comment with all your diagnostics and findings there 
 
     tools:
     - type: McpServer
