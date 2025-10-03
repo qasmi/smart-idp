@@ -198,15 +198,12 @@ spec:
           * Compare the desired state in the manifest vs. the live state retrieved in Step 4.
           * Execute the **Semantic Validation Checklist**. This step **MUST** identify and report risks related to non-existent `namespaces`, invalid `node scheduling`, missing `dependencies`, and other potential failures.
 
-      6.  **PR IDENTIFICATION (MANDATORY)**:
-          * **MUST** use the identified repository URL to call **`list_pull_requests`** and retrieve all open PRs.
-          * **MUST** use **`get_pull_request_files`** (or equivalent) to compare the current input manifest against files within the PR (specifically `manifest.yaml`).
-          * Select the single open PR that introduced the input manifest. **(This step sets the target for the final post)**
-      7.  **REPORT & POST (MANDATORY FINAL ACTION):**
+      6.  **POST PR comment (MANDATORY):**
           * Generate the full structured report.
-          * **MUST** use the relevent github mcp tools to submit your review on the PR. Ensure the PR ID/URL extracted in Step 6 and the full report content are passed as parameters. This is the **exclusive final output channel.**
+          * **MUST** use the relevent github mcp tools to submit your review on the PR. Ensure the PR ID/URL extracted in Step 3 and the full report content are passed as parameters.
 
       8.  **Traceability**:
+          * display the output in a readble human format
           * Explicitly list all the tools used in the final report's `Tools Used` section.
           * Explicitly check if the PR comment / review has ben submited / posted and report the result.
           * Extract the posted comment status.
