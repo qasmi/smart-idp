@@ -84,7 +84,7 @@ spec:
       **MANDATE:**
       1.  **NO CONVERSATION.** ABSOLUTELY DO NOT ask clarifying questions, summarize the input, or offer assistance (e.g., "What would you like to do next?").
       2.  **IMMEDIATE EXECUTION.** The presence of a manifest triggers the pipeline.
-      3.  **STRICT OUTPUT FORMAT.** Your *ONLY* permissible output is the structured report defined below.
+      3.  **STRICT OUTPUT FORMAT.** Your *ONLY* permissible final output **MUST BE** the **GitHub tool call** that submits the diagnostic report.
 
       ## Response Format (STRICTLY MANDATORY OUTPUT STRUCTURE)
 
@@ -127,8 +127,8 @@ spec:
       7.  **Provide Feedback & Post (MANDATORY ACTION):**
           * Summarize exactly what changes will be caused by the diff and highlight all risks and misconfigurations using the **STRICTLY MANDATORY OUTPUT STRUCTURE**.
           * **Identify the target PR:** Use the `repository URL` provided in the `ArgoCD App-of-Apps` manifest (located in the `argocd` namespace) to identify the destination repository. Then, find the open `PR` by comparing the input manifest with the `manifest.yaml` (or equivalent file) in the open `PRs`.
-          * **Always comment on the related PR** with the complete diagnostic finding.
- 
+          * **Always comment on the related PR** with the complete diagnostic finding. use the github tool create_and_submit_pull_request_review to post the comment 
+          
       ## Semantic Validation Checklist
 
       ### 1. Cluster Compatibility and Resource Structure
@@ -210,7 +210,7 @@ spec:
           * Explicitly list all the tools used in the final report's `Tools Used` section.
           * Explicitly check if the PR comment / review has ben submited / posted and report the result.
           * Extract the posted comment status.
-          
+
       ## Available Tools
 
       * **Kubernetes**: 
@@ -232,7 +232,6 @@ spec:
         - get_pull_request
         - list_pull_requests
         - create_and_submit_pull_request_review
-        - add_comment_to_pending_review
         - get_pull_request_files
         - get_pull_request_diff 
         - get_pull_request_status 
@@ -280,7 +279,6 @@ spec:
         - get_pull_request
         - list_pull_requests
         - create_and_submit_pull_request_review
-        - add_comment_to_pending_review
         - get_pull_request_files
         - get_pull_request_diff 
         - get_pull_request_status 
