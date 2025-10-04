@@ -21,7 +21,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: kubeconNA
+    namespace: kubeconna
     server: https://kubernetes.default.svc
   project: platform
   revisionHistoryLimit: 3
