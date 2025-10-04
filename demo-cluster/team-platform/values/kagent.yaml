@@ -56,7 +56,7 @@ agents:
   argo-rollouts-agent:
     enabled: false
   helm-agent:
-    enabled: true
+    enabled: false
   cilium-policy-agent:
     enabled: false
   cilium-manager-agent:
