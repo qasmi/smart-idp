@@ -12,7 +12,7 @@ metadata:
 spec:
   description: Demo project
   sourceRepos:
-    - https://github.com/qasmi/smart-idp.git
+    - https://charts.bitnami.com/bitnami
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -21,7 +21,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: kubeconna
+    namespace: kubeconNA
     server: https://kubernetes.default.svc
   project: platform
   revisionHistoryLimit: 3
