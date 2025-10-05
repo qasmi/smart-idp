@@ -21,7 +21,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: drupal
+    namespace: my-team-namespace
     server: https://kubernetes.default.svc
   project: platform
   revisionHistoryLimit: 3
@@ -46,6 +46,13 @@ spec:
             value: worker
             operator: Equal
             effect: NoSchedule
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2000M
+          requests:
+            cpu: 2000m
+            memory: 2000M
 
         service:
           type: ClusterIP
