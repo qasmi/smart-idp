@@ -46,6 +46,7 @@ spec:
             value: worker
             operator: Equal
             effect: NoSchedule
+
         resources:
           limits:
             cpu: 2000m
@@ -53,9 +54,6 @@ spec:
           requests:
             cpu: 2000m
             memory: 2000M
-
-        service:
-          type: ClusterIP
 
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: "*"
