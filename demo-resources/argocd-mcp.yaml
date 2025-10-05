@@ -1,0 +1,32 @@
+apiVersion: v1
+stringData:
+    LLM_PROVIDER: "openai"
+    OPENAI_API_KEY: ""
+    OPENAI_ENDPOINT: "https://api.openai.com/v1"
+    OPENAI_MODEL_NAME: "gpt-4.1-mini"
+    ARGOCD_TOKEN: ""
+    ARGOCD_API_URL: "http://argocd-server.argocd.svc.cluster.local"
+    ARGOCD_VERIFY_SSL: "false"
+    MCP_MODE: "http"
+    MCP_HOST: "0.0.0.0"
+    MCP_PORT: "8000"
+kind: Secret
+metadata:
+  name: argocd-mcp-secret
+  namespace: kagent
+type: Opaque
+---
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: argocd-mcp-server
+  namespace: kagent
+spec:
+  deployment:
+    image: ghcr.io/cnoe-io/mcp-argocd:stable
+    port: 8000
+    secretRefs:
+    - name: argocd-mcp-secret
+  transportType: "http"
+  httpTransport:
+    targetPort: 8000

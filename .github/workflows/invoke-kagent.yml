@@ -44,4 +44,8 @@ jobs:
       - name: Invoke KAgent
         id: kagent
         run: |
-          kagent --api-url "http://demo-smart-idp.uk/api" invoke --agent gitops-v8-agent --file ./gitops-manifests.yaml   | jq -r '.artifacts[0].parts[0].text'
+          PR_ID="${{ github.event.pull_request.number }}"
+          FILE_PATH="./gitops-manifests.yaml"
+          
+          sed -i "1i PR ID: ${PR_ID}" "${FILE_PATH}"
+          kagent --api-url "http://demo-smart-idp.uk/api" invoke --agent gitops-agent --file  ${FILE_PATH}  | jq -r '.artifacts[0].parts[0].text'
