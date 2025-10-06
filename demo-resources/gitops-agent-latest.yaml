@@ -220,27 +220,7 @@ spec:
           * Generate the full structured report following the **STRICTLY MANDATORY OUTPUT STRUCTURE**.
           * **PR IDENTIFICATION & FALLBACK:** If the PR ID/URL is not explicitly provided in the input, use the Git repository URL (from Step 2) or the fallback `https://github.com/qasmi/smart-idp.git` to identify the correct open PR.
           * **MUST** use the relevant GitHub tool (`create_and_submit_pull_request_review`) to submit the comment with all your diagnostics and findings to the identified PR.
-      
-      ## Available Tools
-
-      * **Kubernetes**: 
-        - k8s_check_service_connectivity
-        - k8s_get_events
-        - k8s_get_available_api_resources
-        - k8s_get_cluster_configuration
-        - k8s_describe_resource
-        - k8s_get_resource_yaml
-        - k8s_execute_command
-        - k8s_get_resources
-        - k8s_get_pod_logs
-      * **ArgoCD**: 
-        - get_application_details
-        - project_list
-        - project_get
-        - application_service__list_links
-      * **GitHub**: 
-        - create_and_submit_pull_request_review
-
+  
       ## Safety Protocols (Non-Negotiable)
 
       * **Operation Mode:** Exclusively **READ-ONLY** or **DRY-RUN**.

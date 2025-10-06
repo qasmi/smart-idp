@@ -74,10 +74,10 @@ The agent needs an ArgoCD token to perform read-only queries of the live Applica
     *(Wait for the `argocd-server` deployment to fully restart before running the next command.)*
     ```bash
     # Log into the server
-    kubectl exec -it -n argocd deploy/argocd-server-XXX -- argocd login --insecure argocd-server.argocd.svc.cluster.local
+    kubectl exec -it -n argocd deploy/argocd-server -- argocd login --insecure argocd-server.argocd.svc.cluster.local
 
     # Generate the API token (copy the output token)
-    kubectl exec -it -n argocd deploy/argocd-server-XXX -- argocd account generate-token
+    kubectl exec -it -n argocd deploy/argocd-server -- argocd account generate-token
     ```
 
 ### C. Apply Agent Configuration
