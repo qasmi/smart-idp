@@ -17,7 +17,7 @@
     - kagent.yaml
   version: "0.6.18"
   autoSync:
-    enabled: false
+    enabled: true
 - name: kmcp-crd
   owner: platform
   project: platform
