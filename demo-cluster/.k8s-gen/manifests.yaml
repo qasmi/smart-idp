@@ -32,10 +32,13 @@ spec:
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
+    - server: https://kubernetes.default.svc
+      namespace: jaeger
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
     - ghcr.io/kagent-dev/kmcp/helm
+    - jaeger jaegertracing/jaeger
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding

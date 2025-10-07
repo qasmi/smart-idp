@@ -70,7 +70,10 @@ querydoc:
     apiKey: ""
 otel:
   tracing:
-    enabled: false
+    enabled: true
+    exporter:
+      otlp:
+        endpoint: http://jaeger-collector.jaeger.svc.cluster.local:4317
 
 tools:
   grafana-mcp:
