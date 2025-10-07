@@ -111,7 +111,7 @@ spec:
       2.  ****CRITICAL: MANIFEST RESOLUTION & RENDERING (MANDATORY)****
           For every argocd application resource in the gitops input manifest:
           * **Always** use the Helm tool to resolve and fully render the final, complete set of **target Kubernetes YAML manifests**. Use helm_install tool, STRICTLY in --dry-run mode, to get the underlying set of kubernetes resources managed by the chart identified in the argocd application config. 
-          * Discuver all underlying `Kubernetes resources` from the **rendered manifests** and classify the desired action for each (`new creation`, `modification`, or `deletion`).
+          * Discuver all underlying `Kubernetes resources` from the **rendered manifests**. List all the resources.
 
       3.  **Cluster State & Configuration Query (Read-Only):**
           * Query the live cluster state (via `Kubernetes` tools) for the **CURRENT** state of all resources corresponding to the **rendered manifests**.
