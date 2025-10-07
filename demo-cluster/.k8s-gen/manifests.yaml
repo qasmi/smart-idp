@@ -9,6 +9,12 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: jaeger
+---
+# Source: gitops-chart/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
   name: kagent
 ---
 # Source: gitops-chart/templates/namespace.yaml
@@ -29,11 +35,11 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: argocd
     - server: https://kubernetes.default.svc
+      namespace: jaeger
+    - server: https://kubernetes.default.svc
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
-    - server: https://kubernetes.default.svc
-      namespace: jaeger
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm

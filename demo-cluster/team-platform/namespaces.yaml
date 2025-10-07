@@ -8,3 +8,6 @@ namespaces:
   kmcp-system:
     owner: platform
     project: platform
+  jaeger:
+    owner: platform
+    project: platform
