@@ -40,7 +40,7 @@
   owner: platform
   project: platform
   namespace: jaeger
-  repo: jaeger jaegertracing/jaeger
+  repo: https://jaegertracing.github.io/helm-charts
   chart: jaeger
   version: "*"
   valueFiles:
