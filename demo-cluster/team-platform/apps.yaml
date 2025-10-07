@@ -36,3 +36,14 @@
   version: "0.1.8"
   autoSync:
     enabled: true
+- name: jaeger
+  owner: platform
+  project: platform
+  namespace: jaeger
+  repo: jaeger jaegertracing/jaeger
+  chart: jaeger
+  version: "*"
+  valueFiles:
+    - jaeger.yaml
+  autoSync:
+    enabled: true
