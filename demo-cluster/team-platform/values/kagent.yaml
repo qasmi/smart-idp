@@ -13,8 +13,9 @@ controller:
   replicas: 1
   loglevel: "info"
   streaming: # Streaming buffer size for A2A communication
-    maxBufSize: 16Mi  # 16 * 1024 * 1024
-    initialBufSize: 16Ki # optional, larger starting buffer
+    maxBufSize: 1Mi # 1024 * 1024
+    initialBufSize: 4Ki # 4 * 1024
+    timeout: 800s # 600 seconds
   resources:
     requests:
       cpu: 100m
