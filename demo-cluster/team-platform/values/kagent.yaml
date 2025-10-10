@@ -20,7 +20,7 @@ controller:
       cpu: 100m
       memory: 128Mi
     limits:
-      cpu: 2
+      cpu: 500m
       memory: 512Mi
   service:
     type: ClusterIP
@@ -34,14 +34,21 @@ ui:
       cpu: 100m
       memory: 256Mi
     limits:
-      cpu: 1000m
-      memory: 1Gi
+      cpu: 500m
+      memory: 512Mi
 kagent-tools:
   fullnameOverride: kagent-tools
   enabled: true
   replicaCount: 1
   tools:
     loglevel: "debug"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 1500m
+        memory: 1Gi
 agents:
   k8s-agent:
     enabled: true
