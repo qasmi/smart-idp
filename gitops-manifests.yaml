@@ -2,36 +2,62 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: cert-manager
+  name: drupal-app
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+spec:
+  description: Demo project
+  sourceRepos:
+    - https://github.com/qasmi/smart-idp.git
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cert-manager
+  name: drupal-app
   namespace: argocd
 spec:
+  destination:
+    namespace: my-team-namespace
+    server: https://kubernetes.default.svc
   project: platform
-  revisionHistoryLimit: 5
-  source:
-    repoURL: https://charts.jetstack.io
-    chart: cert-manager
-    targetRevision: "1.17.*"
+  revisionHistoryLimit: 3
+  sources:
+  - chart: drupal
     helm:
       values: |
+        drupalUsername: admin
+        existingSecret: "drupal-app"
+
+        externalDatabase:
+          host: drupal-app-db-mariadb.drupal-app.svc.cluster.local
+          port: 3306
+          database: bitnami_drupal
+          user: drupal
+          existingSecret: "drupal-app-externaldb"
+
         nodeSelector:
-          node.un.org/role: tooling
-        
+          node.un.org/role: worker
         tolerations:
           - key: node.un.org/role
-            value: tooling
+            value: worker
             operator: Equal
             effect: NoSchedule
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: cert-manager
+
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2000M
+          requests:
+            cpu: 2000m
+            memory: 2000M
+
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: "*"
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-      allowEmpty: true
-    syncOptions:
