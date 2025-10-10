@@ -54,6 +54,9 @@ spec:
           requests:
             cpu: 2000m
             memory: 2000M
+                
+        mariadb:
+          enabled: false
 
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: "*"

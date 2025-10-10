@@ -1,7 +1,7 @@
 apiVersion: kagent.dev/v1alpha2
 kind: Agent
 metadata:
-  name: gitops-agent
+  name: gitops-v11-agent
   namespace: kagent
 spec:
   type: Declarative
