@@ -57,12 +57,24 @@ spec:
 
       3. Manifest Generation (Dry Run):
 
-        * CRITICAL: For each set of extracted parameters, use the installed Helm tools to simulate the chart installation process using helm_install tools (with --dry-run and --output yaml options).
-        * Convert the multiline Helm values YAML into individual key=value or any format you need.
+        * CRITICAL: For each set of extracted parameters, use the installed Helm tools to simulate the chart installation process using a dry run command (equivalent to helm install --dry-run --output yaml or helm template).
         * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application.
-        * Do not ask for confirmation. Execute this step immediatly using helm tools. Helm tools are available and functional.
 
-      Constraint: Do not proceed with Step 3 (Dry Run) unless you have confirmed that the necessary Helm and cluster access tools are available and functional.
+      4. Manifest Aggregation:
+
+        * Combine all individual, generated dry-run YAML manifests (from Step 3) into a single, comprehensive Kubernetes manifest file. This aggregated file represents the complete Desired State.
+
+      5. Live State Comparison (Diffing):
+
+        * MANDATORY: Compare every resource object in the Aggregated Desired State manifest (from Step 4) against the corresponding resource that currently exists in the target cluster (the Live State). This requires using kubernetes tools (e.g., kubectl get <kind>/<name> -o yaml).
+
+      6. Drift Reporting:
+
+        * Analyze and isolate all differences found in Step 5.
+        * Produce a final, structured output that explicitly lists the resource, the field, the expected value (Desired State), and the actual value (Live State).
+        * Clearly label and highlight all detected misconfigurations or configuration drifts.
+
+      Constraint: Do not proceed with Step 3 (Dry Run) or Step 5 (Live Comparison) unless you have confirmed that the necessary Helm and cluster access tools are available and functional.
     tools:   
     - type: McpServer
       mcpServer:
@@ -91,7 +103,3 @@ spec:
         - k8s_get_pod_logs
         - helm_repo_add
         - helm_install
-        - helm_list
-        - helm_get
-        - helm_upgrade
-        - helm_repo_update
