@@ -1,7 +1,7 @@
 apiVersion: kagent.dev/v1alpha2
 kind: Agent
 metadata:
-  name: gitops-v11-agent
+  name: gitops-agent
   namespace: kagent
 spec:
   type: Declarative
@@ -145,7 +145,7 @@ spec:
       ### 2. Workload Integrity and Scheduling
 
       * **Topology and Scheduling:**
-          * **Node Selectors and Taints/Tolerations:** Crucially, **Must** check if the required `node labels`/`taints` defined in the gitops input manifest are present in the current cluster topology, preventing `Pending` state failures.
+          * **Node Selectors and Taints/Tolerations:** Crucially, verify that all nodeSelector labels and taints/tolerations match at least one node in the target Kubernetes cluster. If no matching node is found, the agent should warn about potential Pending state issues due to unschedulable workloads.
           * **Pod Disruption Budgets (`PDBs`):** Check if changes (e.g., scaling down) violate any existing `PDBs`.
           * **Node Affinity/Anti-Affinity:** Validate constraints against available `node labels` and configuration.
 
