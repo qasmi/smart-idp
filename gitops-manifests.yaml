@@ -30,33 +30,33 @@ spec:
     helm:
       values: |
         drupalUsername: admin
-        existingSecret: "drupal-app"
+        #existingSecret: "drupal-app"
 
         externalDatabase:
-          host: drupal-app-db-mariadb.drupal-app.svc.cluster.local
+          host: database.com
           port: 3306
           database: bitnami_drupal
           user: drupal
-          existingSecret: "drupal-app-externaldb"
+          #existingSecret: "drupal-app-externaldb"
 
-        nodeSelector:
-          node-role: storage
-        tolerations:
-          - key: node-role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
+        #nodeSelector:
+        #  node-role: storage
+        #tolerations:
+        #  - key: node-role
+        #    value: storage
+        #    operator: Equal
+        #    effect: NoSchedule
 
         resources:
           limits:
-            cpu: 2000m
-            memory: 2000M
+            cpu: 200m
+            memory: 200M
           requests:
-            cpu: 2000m
-            memory: 2000M
+            cpu: 200m
+            memory: 200M
                 
         pdb:
-          minAvailable: 2
+          minAvailable: 1
 
         mariadb:
           enabled: false
@@ -69,4 +69,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-      
