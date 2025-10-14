@@ -40,10 +40,10 @@ spec:
           existingSecret: "drupal-app-externaldb"
 
         nodeSelector:
-          node/role: worker
+          node-role: storage
         tolerations:
-          - key: node/role
-            value: worker
+          - key: node-role
+            value: storage
             operator: Equal
             effect: NoSchedule
 
