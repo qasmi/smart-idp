@@ -55,11 +55,16 @@ spec:
             cpu: 2000m
             memory: 2000M
                 
+        pdb:
+          minAvailable: 2
+
         mariadb:
+          enabled: false
+        networkPolicy:
           enabled: false
 
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: "*"
+    targetRevision: "21.0.*"
   syncPolicy:
     automated:
       prune: true
