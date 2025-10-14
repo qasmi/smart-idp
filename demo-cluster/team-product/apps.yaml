@@ -1,0 +1,10 @@
+- name: kagent-crds
+  owner: product
+  project: product
+  namespace: drupal-app
+  repo: https://charts.bitnami.com/bitnami
+  chart: drupal
+  version: "21.0.0"
+  valueFile: drupal.yaml
+  autoSync:
+    enabled: true

@@ -9,6 +9,12 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: drupal-app
+---
+# Source: gitops-chart/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
   name: jaeger
 ---
 # Source: gitops-chart/templates/namespace.yaml
@@ -65,6 +71,22 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
+  name: product
+  namespace: argocd
+spec:
+  description: Project product
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: drupal-app
+  sourceRepos:
+    - https://github.com/qasmi/smart-idp.git
+    - https://charts.bitnami.com/bitnami
+  clusterResourceWhitelist: []
+---
+# Source: gitops-chart/templates/project.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
   name: security
   namespace: argocd
 spec:
@@ -86,88 +108,306 @@ spec:
     - group: apiregistration.k8s.io
       kind: APIService
 ---
-# Source: gitops-chart/templates/applicationSet.yaml
+# Source: gitops-chart/templates/application.yaml
 apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
+kind: Application
 metadata:
-  annotations: {}
-  name: platform-apps
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 0
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
-  goTemplate: true
-  generators:
-    - git:
-        repoURL: https://github.com/qasmi/smart-idp.git
-        revision: HEAD
-        files:
-          - path: "demo-cluster/team-platform/apps.yaml"
-  template:
-    metadata:
-      name: '{{ .name }}'
-      namespace: argocd
-      annotations:
-        argocd.argoproj.io/sync-wave: '{{ .syncWave | default "10" }}'
-      finalizers:
-        - "resources-finalizer.argocd.argoproj.io"
-    spec:
-      project: '{{ .project }}'
-      revisionHistoryLimit: 3
-      sources:
-      - repoURL: https://github.com/qasmi/smart-idp.git
-        targetRevision: HEAD
-        ref: valuesRef
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: '{{ .namespace }}'
-  templatePatch: |
-    spec:
-      sources:
-        - chart: '{{ .chart }}'
-          repoURL: '{{ .repo }}'
-          targetRevision: '{{ .version }}'
-          helm:
-            valueFiles:
-            {{- range .valueFiles }}
-              - $valuesRef/demo-cluster/team-platform/values/{{ . }}
-            {{- end }}
-        - repoURL: 'https://github.com/qasmi/smart-idp.git'
-          targetRevision: 'HEAD'
-          path: demo-cluster/team-platform/values
-          ref: valuesRef
-    {{- if .autoSync }}
-      syncPolicy:
-        automated:
-          prune: {{ .autoSync.enabled }}
-          selfHeal: {{ .autoSync.enabled }}
-        {{- if .autoSync.syncOptions }}
-        syncOptions:
-        {{- range .autoSync.syncOptions }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
-    {{- if .ignoreDifferences }}
-      ignoreDifferences:
-    {{- range .ignoreDifferences }}
-      - group: {{ .group }}
-        kind: {{ .kind }}
-        {{- if .name }}
-        name: {{ .name }}
-        {{- end }}
-        {{- if .namespace }}
-        namespace: {{ .namespace }}
-        {{- end }}
-        {{- if .jsonPointers }}
-        jsonPointers:
-        {{- range .jsonPointers }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-        {{- if .jqPathExpressions }}
-        jqPathExpressions:
-        {{- range .jqPathExpressions }}
-          - {{ . }}
-        {{- end }}
-        {{- end }}
-    {{- end }}
-    {{- end }}
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kagent/helm
+    chart: kagent-crds
+    targetRevision: "0.6.18"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kagent
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 1
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kagent/helm
+    chart: kagent
+    targetRevision: "0.6.18"
+    helm:
+      values: |
+        providers:
+          default: openAI
+          openAI:
+            provider: OpenAI
+            model: "gpt-4.1-mini"
+            apiKeySecretRef: kagent-openai
+            apiKeySecretKey: OPENAI_API_KEY
+        database:
+          type: sqlite
+          sqlite:
+            databaseName: kagent.db
+        controller:
+          replicas: 1
+          loglevel: "info"
+          streaming: # Streaming buffer size for A2A communication
+            maxBufSize: 1Mi # 1024 * 1024
+            initialBufSize: 4Ki # 4 * 1024
+            timeout: 800s # 600 seconds
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          service:
+            type: ClusterIP
+            ports:
+              port: 8083
+              targetPort: 8083
+        ui:
+          replicas: 1
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+        kagent-tools:
+          fullnameOverride: kagent-tools
+          enabled: true
+          replicaCount: 1
+          tools:
+            loglevel: "debug"
+            resources:
+              requests:
+                cpu: 500m
+                memory: 512Mi
+              limits:
+                cpu: 1500m
+                memory: 1Gi
+        agents:
+          k8s-agent:
+            enabled: true
+          kgateway-agent:
+            enabled: false
+          istio-agent:
+            enabled: false
+          promql-agent:
+            enabled: false
+          observability-agent:
+            enabled: false
+          argo-rollouts-agent:
+            enabled: false
+          helm-agent:
+            enabled: true
+          cilium-policy-agent:
+            enabled: false
+          cilium-manager-agent:
+            enabled: false
+          cilium-debug-agent:
+            enabled: false
+        querydoc:
+          enabled: true
+          replicas: 1
+          openai:
+            apiKey: ""
+        otel:
+          tracing:
+            enabled: true
+            exporter:
+              otlp:
+                endpoint: http://jaeger-collector.jaeger.svc.cluster.local:4317
+        
+        tools:
+          grafana-mcp:
+            enabled: false
+          querydoc:
+            enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kagent
+  syncPolicy: {}
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 2
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kmcp/helm
+    chart: kmcp-crds
+    targetRevision: "0.1.8"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kmcp-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 3
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: ghcr.io/kagent-dev/kmcp/helm
+    chart: kmcp
+    targetRevision: "0.1.8"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kmcp-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 4
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: platform
+  revisionHistoryLimit: 
+  source:
+    repoURL: https://jaegertracing.github.io/helm-charts
+    chart: jaeger
+    targetRevision: "*"
+    helm:
+      values: |
+        provisionDataStore:
+          cassandra: false
+        allInOne:
+          enabled: true
+        storage:
+          type: memory
+        agent:
+          enabled: false
+        collector:
+          enabled: false
+        query:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jaeger
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []
+---
+# Source: gitops-chart/templates/application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  name: 5
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: product
+  revisionHistoryLimit: 
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    chart: drupal
+    targetRevision: "21.0.0"
+    helm:
+      values: |
+        drupalUsername: admin
+        existingSecret: "drupal-app"
+        
+        externalDatabase:
+          host: drupal-app-db-mariadb.drupal-app.svc.cluster.local
+          port: 3306
+          database: bitnami_drupal
+          user: drupal
+          existingSecret: "drupal-app-externaldb"
+        
+        nodeSelector:
+          node/role: worker
+        tolerations:
+          - key: node/role
+            value: worker
+            operator: Equal
+            effect: NoSchedule
+        
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2000M
+          requests:
+            cpu: 2000m
+            memory: 2000M
+                
+        pdb:
+          minAvailable: 2
+        
+        mariadb:
+          enabled: false
+        networkPolicy:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: drupal-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+  ignoreDifferences: []

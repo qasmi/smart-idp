@@ -1,0 +1,4 @@
+namespaces:
+  drupal-app:
+    owner: product
+    project: product

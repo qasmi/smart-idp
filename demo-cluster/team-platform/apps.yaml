@@ -13,8 +13,7 @@
   namespace: kagent
   repo: ghcr.io/kagent-dev/kagent/helm
   chart: kagent
-  valueFiles: 
-    - kagent.yaml
+  valueFile: kagent.yaml
   version: "0.6.18"
   autoSync:
     enabled: false
@@ -43,7 +42,6 @@
   repo: https://jaegertracing.github.io/helm-charts
   chart: jaeger
   version: "*"
-  valueFiles:
-    - jaeger.yaml
+  valueFile: jaeger.yaml
   autoSync:
     enabled: true

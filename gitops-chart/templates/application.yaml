@@ -1,0 +1,72 @@
+{{- range $applicationName, $application := .Values.applications }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  {{- if $application.annotations }}
+    {{- toYaml $application.annotations | nindent 4 }}
+  {{- end }}
+  name: {{ $applicationName }}
+  namespace: {{ required "argocd.namespace is required" $.Values.argocd.namespace }}
+  {{- if (default true $application.finalize) }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  {{- end }}
+spec:
+  project: {{ required "Project is required" $application.project }}
+  revisionHistoryLimit: {{ $.Values.argocd.revisionHistoryLimit }}
+  source:
+    repoURL: {{ required "Repository is required" $application.repo }}
+    {{- if $application.path }}
+    path: {{ $application.path }}
+    {{- end }}
+    {{- if $application.chart }}
+    chart: {{ $application.chart }}
+    {{- end }}
+    targetRevision: {{ required "Revision is required" $application.version | quote }}
+    {{- $values := trim (tpl ($.Files.Get (print "team-" $application.owner "/values/" $application.valueFile)) $) }}
+    {{- if or $values $application.valueFile }}
+    helm:      
+      {{- if $values }}
+      values: |
+        {{- $values | nindent 8 }}
+      {{- else }}
+      valueFiles:
+        - {{ print "../demo-cluster/team-" $application.owner "/values/" $application.valueFile }}
+      {{- end }}
+    {{- end }}
+  destination:
+    server: https://kubernetes.default.svc
+    {{- if $application.namespace }}
+    namespace: {{ $application.namespace }}
+    {{- end }}
+  {{- if $application.autoSync.enabled }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+    {{- range $syncOption := $application.autoSync.syncOptions }}
+    - {{ $syncOption }}
+    {{- end }}
+  {{- else }}
+  syncPolicy: {}
+  {{- end }}
+  {{- if $application.ignoreDifferences }}
+  ignoreDifferences:
+    {{- range $ignoreDifference := $application.ignoreDifferences }}
+    - group: {{ $ignoreDifference.group | default "" }}
+      jqPathExpressions:
+        {{- range $path := $ignoreDifference.jqPathExpressions }}
+        - {{ $path }}
+        {{- end }}
+      kind: {{ $ignoreDifference.kind | default "" }}
+      name: {{ $ignoreDifference.name | default "" }}
+    {{- end }}
+  {{- else }}
+  ignoreDifferences: []
+  {{- end }}
+{{- end }}

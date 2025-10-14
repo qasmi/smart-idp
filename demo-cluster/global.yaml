@@ -1,9 +1,9 @@
 environment:
   name: demo-cluster
 
-teams:
-  platform:
-    clusterAdmin: true
+teams: []
+  #platform:
+  #  clusterAdmin: true
 
 argocd:
   namespace: argocd
