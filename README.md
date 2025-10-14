@@ -61,32 +61,11 @@ The agent requires API keys for analysis and posting feedback.
   * **GitHub Token (for MCP):** Edit **`demo-resources/github-mcp.yaml`** to inject your GitHub Personal Access Token (PAT).
     *(This token needs read/write permissions for PRs/issues to post the review comment).*
 
-### B. Generate ArgoCD Admin Token
+### B. Apply Agent Configuration
 
-The agent needs an ArgoCD token to perform read-only queries of the live Application state.
-
-1.  **Enable Admin API Access:**
-    ```bash
-    kubectl -n argocd patch configmap argocd-cm --type merge -p '{"data":{"accounts.admin":"apiKey, login"}}'
-    kubectl -n argocd rollout restart deployment argocd-server
-    ```
-2.  **Generate Token:**
-    *(Wait for the `argocd-server` deployment to fully restart before running the next command.)*
-    ```bash
-    # Log into the server
-    kubectl exec -it -n argocd deploy/argocd-server -- argocd login --insecure argocd-server.argocd.svc.cluster.local
-
-    # Generate the API token (copy the output token)
-    kubectl exec -it -n argocd deploy/argocd-server -- argocd account generate-token
-    ```
-
-### C. Apply Agent Configuration
-
-1.  Edit **`demo-resources/argocd-mcp.yaml`** to inject your GitHub PAT and the generated ArgoCD token.
-2.  Apply all configurations and deploy the final GitOps agent:
+1.  Apply all configurations and deploy the final GitOps agent:
     ```bash
     kubectl apply -f demo-resources/github-mcp.yaml 
-    kubectl apply -f demo-resources/argocd-mcp.yaml 
     kubectl apply -f demo-resources/gitops-agent.yaml 
     ```
 
@@ -95,7 +74,10 @@ The agent needs an ArgoCD token to perform read-only queries of the live Applica
 To allow local or CI invocation, forward the controller service port:
 
 ```bash
-kubectl port-forward svc/kagent-controller 8083:8083 -n kagent
+kubectl port-forward svc/kagent-controller 8083:8083 -n kagent &
+kubectl port-forward svc/argocd-server 80:80 -n argocd &
+kubectl port-forward svc/kagent-ui 8081:8080 -n kagent &
+kubectl port-forward svc/jaeger-query -n jaeger 16686:16686 &
 ```
 
 ## 5\. Invoke GitOps Agent (using the CLI)
