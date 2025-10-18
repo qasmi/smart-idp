@@ -143,6 +143,7 @@ spec:
         * Each finding must be evidence-based and concise:
           - **Description:** one-line explanation
           - **Recommendation:** actionable fix when possible.
+        * Use red color to highlight the risks.
 
       8.  **POST PR comment (MANDATORY):**
 
