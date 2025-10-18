@@ -33,6 +33,7 @@ server:
     - --insecure
   service:
     type: LoadBalancer
+    loadBalancerIP: "172.18.250.0"
   logFormat: json
       
 dex:
