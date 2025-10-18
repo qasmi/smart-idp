@@ -144,9 +144,9 @@ spec:
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
         #### 3. Risk Analysis
-        * Only Include relevent risks, violations, or misconfigurations** detected by the semantic validations, configuration checks, or runtime predictions.
-        * Include this section when relevant **only**.
-        
+        * Include verifyed risks, violations, or misconfigurations** detected by the semantic validations, configuration checks, or runtime predictions.
+        * **MUST** Only report violations, focus on verifyed validation.
+
       8.  **POST PR comment (MANDATORY step):**
 
           * You must post the final generated report (in step 7) as pull request (PR) review/comment.
