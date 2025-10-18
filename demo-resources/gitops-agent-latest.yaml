@@ -128,6 +128,7 @@ spec:
 
         #### 2. Impact Prediction
         * Provide a **short, developer-friendly summary** of the real-world runtime impact.
+        * Use a list short precise paragraphe.
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
         #### 3. Risks and Misconfigurations
