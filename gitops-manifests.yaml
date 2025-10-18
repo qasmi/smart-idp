@@ -52,7 +52,7 @@ spec:
             effect: NoSchedule
       
         service:
-          #type: LoadBalancer
+          type: LoadBalancer
           clusterIP: "172.18.250.0"
 
     repoURL: http://daocloud.github.io/dao-2048/
