@@ -142,18 +142,7 @@ spec:
         * Provide a **short, developer-friendly summary** of the real-world runtime impact.
         * Use a list short precise paragraphe.
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
-
-        #### 3. Risks and Misconfigurations (When it's relevent, or skip it)
-        * Include this section **only if** one or more semantic validations, configuration checks, or runtime predictions
-          identified **actual risks, violations, or misconfigurations**.
-        * **Silence on success is mandatory** — do not generate placeholder or “all good” statements.
-        * Forbidden outputs:
-          - “No issues found”
-          - “Everything looks correct”
-          - “No referenced ConfigMaps, Secrets, or dependencies are missing”
-        * Each finding must be evidence-based and concise:
-          - **Description:** one-line explanation
-          - **Recommendation:** actionable fix when possible.
+        * Include the semantic validations, configuration checks, or runtime predictions identified **actual risks, violations, or misconfigurations**.
 
       8.  **POST PR comment (MANDATORY (Final Output)):**
 
