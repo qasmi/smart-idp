@@ -44,10 +44,10 @@ spec:
             memory: 128Mi
 
         nodeSelector:
-          node/role: storage
+          node-role: storage
         
         tolerations:
-          - key: node/role
+          - key: node-role
             value: storage
             operator: Equal
             effect: NoSchedule
