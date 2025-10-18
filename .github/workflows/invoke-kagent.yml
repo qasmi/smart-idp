@@ -48,4 +48,4 @@ jobs:
           FILE_PATH="./gitops-manifests.yaml"
           
           sed -i "1i PR ID: ${PR_ID}. Input manifest start here:" "${FILE_PATH}"
-          kagent --api-url "https://demo-smart-idp.uk/api" invoke --agent gitops-agent --file  ${FILE_PATH}  | jq -r '.artifacts[0].parts[0].text'
+          kagent --api-url "https://demo-smart-idp.uk/api" invoke --agent gitops-v12-agent --file  ${FILE_PATH}  | jq -r '.artifacts[0].parts[0].text'
