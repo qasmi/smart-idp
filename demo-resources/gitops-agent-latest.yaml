@@ -115,17 +115,34 @@ spec:
           * Predict the runtime behavior and outcome of the resources involved in the diff.
 
       7. PR comment: Drift Reporting:
-        When posting to the PR, write only the sections that have content, in this order:
-        1. Real time diff:
-          * **MANDATORY SUMMARY TABLE:** Produce a structured output that includes a table with columns:
-                | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE / NO CHANGE) |
-        2.  Impact prediction:
-          * Brief Summarize of the impact prediction in developer friendly language. 
-        3. Risks and misconfigurations:
-          * Summarize exactly what changes will be caused by the diff and highlight the misconfigurations, runtime issue, risks.
-          * Provide recomendation when it's possible.
-          * Silence on success: If a validation category has no issues, do not mention it.
-          
+        When posting to the PR, include **only** sections that have at least one concrete finding or meaningful diff.
+        If a section produces no findings or actionable content, **omit it entirely**.
+
+        The output must strictly follow this order:
+
+        #### 1. Real-Time Diff Summary
+        * **MANDATORY SUMMARY TABLE:** Include **only** resources whose state has changed or is being created/deleted.
+        * Table format:
+          | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE) |
+        * Omit resources with **NO CHANGE** — they must not appear in this table.
+
+        #### 2. Impact Prediction
+        * Provide a **short, developer-friendly summary** of the real-world runtime impact.
+        * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
+
+        #### 3. Risks and Misconfigurations
+        * Include this section **only if** one or more semantic validations, configuration checks, or runtime predictions
+          identified **actual risks, violations, or misconfigurations**.
+        * **Silence on success is mandatory** — do not generate placeholder or “all good” statements.
+        * Forbidden outputs:
+          - “No issues found”
+          - “Everything looks correct”
+          - “No referenced ConfigMaps, Secrets, or dependencies are missing”
+        * Each finding must be evidence-based and concise:
+          - **Finding:** short identifier (e.g., `MISSING_DEPENDENCY`, `UNSCHEDULABLE`, `RESOURCE_QUOTA_EXCEEDED`)
+          - **Description:** one-line explanation
+          - **Recommendation:** actionable fix when possible.
+
       8.  **POST PR comment (MANDATORY):**
 
           * Post the drift reporting generated in step 7 as pull request reviw, if this step fail the 1st time, resubmit a second one.
