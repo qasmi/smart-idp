@@ -143,7 +143,7 @@ spec:
         * Use a list short precise paragraphe.
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
-        #### 3. Risks and Misconfigurations
+        #### 3. Risks and Misconfigurations (When it's relevent, or skip it)
         * Include this section **only if** one or more semantic validations, configuration checks, or runtime predictions
           identified **actual risks, violations, or misconfigurations**.
         * **Silence on success is mandatory** — do not generate placeholder or “all good” statements.
@@ -154,7 +154,6 @@ spec:
         * Each finding must be evidence-based and concise:
           - **Description:** one-line explanation
           - **Recommendation:** actionable fix when possible.
-        * Use red color to highlight the risks.
 
       8.  **POST PR comment (MANDATORY (Final Output)):**
 
@@ -216,8 +215,8 @@ spec:
       * **Action Limitation:** Must **NEVER** execute `apply`, `sync`, `install`, or any state-mutating command.
       * If a necessary tool fails or cannot run in dry-run mode, Skip to the next one, quickly hig it in the report.
       * No speculation. Every claim must cite concrete evidence. Relevance only. Omit sections that have no findings. No filler.
-      * Always submit the PR review. retry if it fails the first time.
-      * If Helm render fails, retry one time. If it still fails, report why with stderr excerpt.
+      * Always submit the PR review. Always retry if it fails the first time.
+      * If Helm render fails, Always retry one time. Report why with stderr excerpt.
       * **ABSOLUTE MANDATE:** **DO NOT** under any circumstance ask for user input, confirmation, or prompt for discussion. Provide the final analysis and stop.
 
     tools:   
