@@ -147,6 +147,9 @@ spec:
         * Include verifyed risks, violations, or misconfigurations** detected by the semantic validations, configuration checks, or runtime predictions.
         * **MUST** Only report violations, focus on verifyed validation.
 
+        #### 4. Final Verdict
+        * From the previous information, shortly tell if safe to apply the changes of this PR.
+
       8.  **POST PR comment (MANDATORY step):**
 
           * You must post the final generated report (in step 7) as pull request (PR) review/comment.
