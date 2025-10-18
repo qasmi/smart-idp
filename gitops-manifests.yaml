@@ -55,7 +55,7 @@ spec:
           #type: LoadBalancer
           clusterIP: "172.18.250.1"
 
-    repoURL: https://charts.bitnami.com/bitnami
+    repoURL: http://daocloud.github.io/dao-2048/
     targetRevision: "1.2.1"
   syncPolicy:
     automated:
