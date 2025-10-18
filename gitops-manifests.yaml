@@ -14,7 +14,7 @@ spec:
     requests.memory: "1Gi" 
     limits.cpu: "1"  
     limits.memory: "1Gi" 
-    pods: "1"   
+    pods: "2"   
     services: "5"  
     persistentvolumeclaims: "4"
 ---
