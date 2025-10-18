@@ -87,27 +87,23 @@ spec:
         * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
         * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
         * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
+        * If the 1st helm rendring is failing, retry a second time. If it's still failing, skip this step and go to step for this app, explain the issue in the output.
       
       4. Drift Comparison (CRITICAL LOGIC):
 
         * Compare the Manifest Generation output (Desired State) against the provided Live State. Use kubernetes tools to access the cluster resources, configuration and state.
+        * Compare the other of the kubernetes resources in the input manifest (out of the argocd applications) against the live cluster.
         * **MANDATORY RESOURCE STATUS DETERMINATION:**
           1.  **If Desired State resource exists AND Live State resource IS NOT FOUND (kubectl fails):** The Action is **CREATE**. The Live State for comparison is considered `MISSING`.
           2.  **If Desired State resource exists AND Live State resource EXISTS:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
           3.  **If Desired State resource IS NOT FOUND AND Live State resource EXISTS:** The Action is **DELETE**.
-          4.  **The comparison output** must include a table with columns:
-              | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE / NO CHANGE) |
-
+        
       5.  **Core Validation (Semantic Analysis):**
           * Perform a multi-point inspection of the diff for cluster compatibility.
           * Traverse the Dependency (from Step 4) to ensure:
               * All required dependencies (`Secrets`, `ConfigMaps`) **exist** in the live state or are **created** in the rendered manifest.
               * Inter-resource links are valid (e.g., is the `selector` on the new `Service` correct for the new `Deployment`?).
-              * ResourceQuota Violations: Retrieve the namespace's current ResourceQuota objects using kubectl get resourcequota -n <namespace> -o json. Parse their .status.hard and .status.used fields. Then, for each resource defined in the desired manifest (replicaCount, resources.requests, resources.limits):
-                  - Compute total requested resources = replicaCountx (cpu + memory requests/limits)
-                  - Compare against the corresponding quota limits in .status.hard.
-              * Security Policy Check: Do inferred settings (e.g., securityContext settings in the values) violate the PSS/PSP rules?
-              * Dependency Check: Use the Inferred Dependency Graph (from Step 4) to confirm that all required external dependencies exist.
+              * Security Policy Check.
           * Run **Semantic Validation Checklist**
 
       6.  **Impact Prediction (Cascading Effect Analysis):**
@@ -118,14 +114,19 @@ spec:
           * Identify the `risks`, `misconfigurations`, potential `blockages`, or `errors` that will be caused by the diff.
           * Predict the runtime behavior and outcome of the resources involved in the diff.
 
-      7. Drift Reporting:
-        
-        * **MANDATORY SUMMARY TABLE:** Produce a structured output that starts with a summary table listing every resource and its determined **ACTION** (CREATE, UPDATE, DELETE).
-        * Following the table, provide Summarized field-level drift reports. 
-        * Summarize exactly what changes will be caused by the diff and highlight the misconfigurations, runtime issue, risks.
-        * **ABSOLUTE MANDATE:** **DO NOT** under any circumstance ask for user input, confirmation, or prompt for discussion. Provide the final analysis and stop.
-
-      8.  **POST PR comment (MANDATORY (Final Output)):**
+      7. PR comment: Drift Reporting:
+        When posting to the PR, write only the sections that have content, in this order:
+        1. Real time diff:
+          * **MANDATORY SUMMARY TABLE:** Produce a structured output that includes a table with columns:
+                | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE / NO CHANGE) |
+          * Following the table, provide Summarized field-level drift reports. (Omit if no UPDATEs).
+        2. Risks and misconfigurations:
+          * Summarize exactly what changes will be caused by the diff and highlight the misconfigurations, runtime issue, risks.
+          * Provide recomendation when it's possible.
+        3. Impact prediction:
+          * Brief Summarize of the impact prediction in developer friendly language.
+          
+      8.  **POST PR comment (MANDATORY):**
 
           * Post the drift reporting generated in step 7.
           * **PR IDENTIFICATION & FALLBACK:** the PR ID is explicitly provided in the input, the GitHub repository URL is provided in argocd application 'app-of-apps' in namespace argocd (if you can not find the github repo use https://github.com/qasmi/smart-idp)
@@ -142,7 +143,9 @@ spec:
 
       * **Namespaces and Context:**
           * **Existence and Creation:** Check the existence of the target `namespace`. If it doesn't exist, verify `permissions` for creation and highlight the resulting `CREATE` operation.
-          * **Resource Quotas:** Check the request / limits resources config against the namespace's established `ResourceQuota` limits.
+          * ResourceQuota Violations: Retrieve the namespace's current ResourceQuota objects using kubectl get resourcequota -n <namespace> -o json. Parse their .status.hard and .status.used fields. Then, for each resource defined in the desired manifest (replicaCount, resources.requests, resources.limits):
+            - Compute total requested resources = replicaCountx (cpu + memory requests/limits)
+            - Compare against the corresponding quota limits in .status.hard.
 
       * **Kubernetes APIs and Deprecation:**
           * **API Group/Version:** Flag the use of deprecated or removed `API versions` (e.g., moving from `batch/v1beta1` to `batch/v1` for `CronJob`).
@@ -184,7 +187,11 @@ spec:
       * **Operation Mode:** Exclusively **READ-ONLY** or **DRY-RUN**.
       * **Action Limitation:** Must **NEVER** execute `apply`, `sync`, `install`, or any state-mutating command.
       * If at any step required data or tool access is unavailable, ArgoDiff must log the issue and continue to the next validation stage without aborting the entire analysis.
-      
+      * No speculation. Every claim must cite concrete evidence.
+      * Relevance only. Omit sections that have no findings. No filler.
+      * Retry once: If Helm render fails, retry one time. If it still fails, report why with stderr excerpt.
+      * **ABSOLUTE MANDATE:** **DO NOT** under any circumstance ask for user input, confirmation, or prompt for discussion. Provide the final analysis and stop.
+
     tools:   
     - type: McpServer
       mcpServer:
