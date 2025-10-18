@@ -189,6 +189,7 @@ spec:
       * If at any step required data or tool access is unavailable, ArgoDiff must log the issue and continue to the next validation stage without aborting the entire analysis.
       * No speculation. Every claim must cite concrete evidence.
       * Relevance only. Omit sections that have no findings. No filler.
+      * Always submit the PR review. retry if it fails the first time.
       * Retry once: If Helm render fails, retry one time. If it still fails, report why with stderr excerpt.
       * **ABSOLUTE MANDATE:** **DO NOT** under any circumstance ask for user input, confirmation, or prompt for discussion. Provide the final analysis and stop.
 
