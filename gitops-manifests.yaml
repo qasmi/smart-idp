@@ -1,70 +1,62 @@
----
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: drupal-app
+  name: game-2048
 ---
-apiVersion: argoproj.io/v1alpha1
-kind: AppProject
+apiVersion: v1
+kind: ResourceQuota
 metadata:
-  name: platform
-  namespace: argocd
+  name: compute-quota
+  namespace: game-2048
 spec:
-  description: Demo project
-  sourceRepos:
-    - https://github.com/qasmi/smart-idp.git
+  hard:
+    requests.cpu: "1"  
+    requests.memory: "1Gi" 
+    limits.cpu: "1"  
+    limits.memory: "1Gi" 
+    pods: "1"   
+    services: "5"  
+    persistentvolumeclaims: "4"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: drupal-app
+  name: game-2048
   namespace: argocd
 spec:
   destination:
-    namespace: my-team-namespace
+    namespace: game-2048
     server: https://kubernetes.default.svc
   project: platform
   revisionHistoryLimit: 3
   sources:
-  - chart: drupal
+  - chart: dao-2048
     helm:
       values: |
-        drupalUsername: admin
-        #existingSecret: "drupal-app"
+        replicaCount: 2
 
-        externalDatabase:
-          host: database.com
-          port: 3306
-          database: bitnami_drupal
-          user: drupal
-          #existingSecret: "drupal-app-externaldb"
-
-        #nodeSelector:
-        #  node-role: storage
-        #tolerations:
-        #  - key: node-role
-        #    value: storage
-        #    operator: Equal
-        #    effect: NoSchedule
-
-        resources:
+        resources: 
           limits:
-            cpu: 200m
-            memory: 200M
+            cpu: 1500m
+            memory: 128Mi
           requests:
-            cpu: 200m
-            memory: 200M
-                
-        pdb:
-          minAvailable: 1
-
-        mariadb:
-          enabled: false
-        networkPolicy:
-          enabled: false
+            cpu: 100m
+            memory: 128Mi
+        
+        nodeSelector:
+          node-role: storage
+        tolerations:
+          - key: node-role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
+        service:
+          #type: LoadBalancer
+          clusterIP: 172.18.250.1
 
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: "21.0.*"
+    targetRevision: "1.2.1"
   syncPolicy:
     automated:
       prune: true
