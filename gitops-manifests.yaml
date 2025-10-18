@@ -37,23 +37,16 @@ spec:
 
         resources: 
           limits:
-            cpu: 1500m
+            cpu: 500m
             memory: 128Mi
           requests:
             cpu: 100m
             memory: 128Mi
         
-        nodeSelector:
-          node-role: storage
-        tolerations:
-          - key: node-role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
       
         service:
           type: LoadBalancer
-          clusterIP: "172.18.250.0"
+          clusterIP: "172.18.250.1"
 
     repoURL: http://daocloud.github.io/dao-2048/
     targetRevision: "1.2.1"
