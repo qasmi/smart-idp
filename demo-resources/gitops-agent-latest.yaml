@@ -138,7 +138,7 @@ spec:
         * Omit resources with **NO CHANGE** — they must not appear in this table.
         * Report helm rendring failure only here.
 
-        #### 2. Impact Prediction
+        #### 2. Impact Prediction and Risk Analysis
         * Provide a **short, developer-friendly summary** of the real-world runtime impact.
         * Use a list short precise paragraphe.
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
