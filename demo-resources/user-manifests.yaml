@@ -15,8 +15,6 @@ spec:
     limits.cpu: "1"  
     limits.memory: "1Gi" 
     pods: "2"   
-    services: "5"  
-    persistentvolumeclaims: "4"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -33,7 +31,7 @@ spec:
   - chart: dao-2048
     helm:
       values: |
-        replicaCount: 4
+        replicaCount: 3
 
         resources: 
           limits:
@@ -44,10 +42,10 @@ spec:
             memory: 128Mi
 
         nodeSelector:
-          node-role: storage
+          node/role: storage
         
         tolerations:
-          - key: node-role
+          - key: node/role
             value: storage
             operator: Equal
             effect: NoSchedule
