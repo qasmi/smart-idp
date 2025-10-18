@@ -119,12 +119,12 @@ spec:
         1. Real time diff:
           * **MANDATORY SUMMARY TABLE:** Produce a structured output that includes a table with columns:
                 | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE / NO CHANGE) |
-          * Following the table, provide Summarized field-level drift reports. (Omit if no UPDATEs).
-        2. Risks and misconfigurations:
+        2.  Impact prediction:
+          * Brief Summarize of the impact prediction in developer friendly language. 
+        3. Risks and misconfigurations:
           * Summarize exactly what changes will be caused by the diff and highlight the misconfigurations, runtime issue, risks.
           * Provide recomendation when it's possible.
-        3. Impact prediction:
-          * Brief Summarize of the impact prediction in developer friendly language.
+          * Silence on success: If a validation category has no issues, do not mention it.
           
       8.  **POST PR comment (MANDATORY):**
 
