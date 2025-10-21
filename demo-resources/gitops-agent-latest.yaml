@@ -77,11 +77,17 @@ spec:
 
       2. Desired State Extraction:
 
-        * For each extracted ArgoCD Application, meticulously parse the .spec.source field to obtain the following Helm-specific desired state parameters:
-          - repoURL (the chart repository).
-          - targetRevision (the chart version/tag, typically .spec.source.targetRevision).
-          - values (the complete set of Helm values defined under .spec.source.helm.values or parameters).
-
+        * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
+        * **Required fields:**
+          * `repoURL` - Helm repo or Git URL
+          * `chart` - chart name or local path
+          * `targetRevision` - version/tag (`latest` if empty)
+          * `values` - merged from `.helm.values` and `.helm.parameters`
+          * `namespace` - from `.spec.destination.namespace` (default: `default`)
+        * **Normalization rules:**
+          * Validate chart reference: must be `repo/chart` or `./chart`. If invalid, mark as `FAILED_EXTRACTION`.
+          * Merge Helm values and parameters into a single `--values`/`--set` structure.
+          
       3. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
 
         * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
