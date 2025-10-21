@@ -51,21 +51,12 @@ spec:
 
         resources: 
           limits:
-            cpu: 2000m
+            cpu: 200m
             memory: 128Mi
           requests:
             cpu: 100m
             memory: 128Mi
 
-        nodeSelector:
-          role: storage
-        
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
-      
         service:
           type: LoadBalancer
 
