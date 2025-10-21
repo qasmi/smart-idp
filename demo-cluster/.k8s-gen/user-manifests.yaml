@@ -41,7 +41,7 @@ spec:
   destination:
     namespace: game-2048
     server: https://kubernetes.default.svc
-  project: platform
+  project: user
   revisionHistoryLimit: 3
   sources:
   - chart: dao-2048
