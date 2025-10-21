@@ -1,7 +1,7 @@
 PATH_DIR := ./scripts
 CONFIG   := $(PATH_DIR)/config.yaml
 TMP      := $(PATH_DIR)/tmp.yaml
-OUTPUT   := ./.k8s-gen/manifests.yaml
+OUTPUT   := ./.k8s-gen/platform-manifests.yaml
 
 all: generate clean
 
