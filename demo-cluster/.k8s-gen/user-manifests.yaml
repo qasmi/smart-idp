@@ -47,7 +47,7 @@ spec:
   - chart: dao-2048
     helm:
       values: |
-        replicaCount: 3
+        replicaCount: 1
 
         resources: 
           limits:

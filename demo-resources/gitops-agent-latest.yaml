@@ -138,16 +138,16 @@ spec:
         * Omit resources with **NO CHANGE** — they must not appear in this table.
         * Report helm rendring failure if it happen. Never repport the successful execution of the helm rundreing.
 
-        #### 2. Impact Prediction
-        * Provide a **short, developer-friendly summary** of the real-world runtime impact.
-        * Use a list short precise paragraphe.
-        * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
-
-        #### 3. Risk Analysis
+        #### 2. Risk Analysis
         * Report **only** confirmed risks, violations, or misconfigurations discovered during semantic or runtime validation.
         * **Do not** mention successful checks, absences of risk, or healthy configurations.
         * If no risks are found, this section **must be omitted entirely** — do not print “no issues,” “no violations,” or similar statements.
         * Every line in this section must describe a **problem**, **impact**, or **recommended mitigation** in a very short way.
+
+        #### 3. Impact Prediction
+        * Provide a **short, developer-friendly summary** of the real-world runtime impact.
+        * Use a list short precise paragraphe.
+        * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
         #### 4. Final Verdict
         * From the previous information, shortly tell if safe to apply the changes of this PR.
