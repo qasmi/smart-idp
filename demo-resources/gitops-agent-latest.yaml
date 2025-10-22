@@ -204,14 +204,13 @@ spec:
 
       ### 3. Workload Scheduling and Topology Validation
 
-      * **Node Selectors, Affinity, and Tolerations:**
-
-        * Retrieve all node labels and taints from the cluster (`kubectl get nodes -o json`).
-        * Evaluate whether the workload's scheduling constraints match at least one node.
-        * Report deterministic outcomes:
-
-          * `Schedulable`: list matching nodes.
-          * `Unschedulable`: explicit mismatch reason.
+      * **Topology and Scheduling:**
+          * Node Selectors and Taints/Tolerations (Definitive Validation):
+              Query the live cluster nodes directly (kubectl get nodes -o json) and compare their labels and taints against the manifest requirements.
+              Produce an explicit, evidence-based determination:
+                - Schedulable: List all nodes that satisfy the manifest's nodeSelector and toleration criteria.
+                - Unschedulable: Explicitly confirm that no nodes match and that the workload will remain Pending until the mismatch is resolved.
+              Do not speculate — rely exclusively on live cluster data.
 
       * **Pod Disruption Budgets (PDBs):**
 
