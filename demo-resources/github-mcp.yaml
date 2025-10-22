@@ -13,12 +13,14 @@ kind: MCPServer
 metadata:
   name: github-mcp-server
   namespace: kagent
+  labels:
+    kagent.dev/discovery: disabled
 spec:
-  deployment:    
+  deployment:
     args:
     - 'stdio'
     cmd: "/server/github-mcp-server"
-    image: ghcr.io/github/github-mcp-server:0.7.4-musl
+    image: ghcr.io/github/github-mcp-server
     port: 3000
     secretRefs:
     - name: github-mcp-secret
