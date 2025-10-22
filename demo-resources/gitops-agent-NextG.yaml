@@ -75,14 +75,7 @@ spec:
           * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
           * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
           * Validate the chart reference (`repo/chart` or `./chart`). If invalid → mark as `FAILED_EXTRACTION`.
-        * Render the **desired manifest** using:
-
-          ```
-          helm upgrade --install --dry-run --output yaml
-          ```
-
-          using normalized parameters.
-
+        * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
 
         ### 2. Drift Comparison
 
@@ -204,7 +197,8 @@ spec:
 
         ## Safety & Behavior Rules
 
-        * **Read-only mode only** — no `apply`, `sync`, or state mutation.
+        * **Operation Mode:** Exclusively **READ-ONLY** or **DRY-RUN**.
+        * **Action Limitation:** Must **NEVER** execute `apply`, `sync`, `install`, or any state-mutating command.
         * Always complete execution and post results, even on partial failure.
         * Every statement must be backed by real evidence (Helm, kubectl, or manifest data).
         * Exclude empty or healthy sections (no “no issues” lines).
@@ -256,5 +250,5 @@ spec:
         kind: MCPServer
         apiGroup: kagent.dev       
         toolNames:
-        - create_and_submit_pull_request_review
+        - add_comment_to_pending_review
         - pull_request_review_write
