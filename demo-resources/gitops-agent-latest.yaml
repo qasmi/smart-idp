@@ -144,8 +144,8 @@ spec:
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
       6.  **POST PR comment (MANDATORY step):**
-
-        * **PR IDENTIFICATION:** the PR ID is explicitly provided in the input. The GitHub repository URL to use, is configured in the 'app-of-apps' argocd application running aergocd namespace, under 'spec.source.repoURL'.
+      
+        * **PR IDENTIFICATION & FALLBACK:** the PR ID is explicitly provided in the input, the githup repository URL is provided in argocd application 'app-of-apps' in namespace argocd (if you can not find the github repo use https://github.com/qasmi/smart-idp)
         * Submit the generated report (in step 5) into the pull request (PR) review/comment.
         * **MUST** use the relevant GitHub tools to submit the PR comment / review.
 
