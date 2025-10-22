@@ -72,74 +72,68 @@ spec:
 
       1. Input Parsing:
 
-        * Ingest the complete YAML content provided by the user.
-        * MANDATORY: Extract every Kubernetes resource of kind: Application that belongs to the argoproj.io/v1alpha1 API group.
+        * Ingest the complete YAML content provided by the user. Extract all the kubernetes resources.
+        * MANDATORY: for every Kubernetes resource of kind: Application that belongs to the argoproj.io/v1alpha1 API group:
 
-      2. Desired State Extraction:
+          a. Desired State Extraction:
 
-        * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
-        * **Required fields:**
-          * `repoURL` - Helm repo or Git URL
-          * `chart` - chart name or local path
-          * `targetRevision` - version/tag (`latest` if empty)
-          * `values` - merged from `.helm.values` and `.helm.parameters`
-          * `namespace` - from `.spec.destination.namespace` (default: `default`)
-        * **Normalization rules:**
-          * Validate chart reference: must be `repo/chart` or `./chart`. If invalid, mark as `FAILED_EXTRACTION`.
-          * Merge Helm values and parameters into a single `--values`/`--set` structure.
-          
-      3. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
+            * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
+            * **Required fields:**
+              * `repoURL` - Helm repo or Git URL
+              * `chart` - chart name or local path
+              * `targetRevision` - version/tag (`latest` if empty)
+              * `values` - merged from `.helm.values` and `.helm.parameters`
+              * `namespace` - from `.spec.destination.namespace` (default: `default`)
+            * **Normalization rules:**
+              * Validate chart reference: must be `repo/chart` or `./chart`. If invalid, mark as `FAILED_EXTRACTION`.
+              * Merge Helm values and parameters into a single `--values`/`--set` structure.
+              
+          b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
 
-        * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
-        * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
-        * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
+            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
+            * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
       
-      4. Drift Comparison (CRITICAL LOGIC):
+      2. Drift Comparison (CRITICAL LOGIC):
 
-        * Compare the Manifest Generation output (Desired State) against the provided Live State. Use kubernetes tools to access the cluster resources, configuration and state.
+        * Combine the generated kubernetes resources (produced by helm chart rundreing) with the input manifest resources to produce the exhaustive desired manifest.
+        * For each resource of the exhaustive desired manifest, run kubernetes tools get the configuration and state of the resources in the live cluster.
         * **MANDATORY RESOURCE STATUS DETERMINATION:**
-          1.  **If Desired State resource exists AND Live State resource IS NOT FOUND (kubectl fails):** The Action is **CREATE**. The Live State for comparison is considered `MISSING`.
-          2.  **If Desired State resource exists AND Live State resource EXISTS:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
-          3.  **If Desired State resource IS NOT FOUND AND Live State resource EXISTS:** The Action is **DELETE**.
-          4.  **The comparison output** must include a table with columns:
-              | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE / NO CHANGE) |
+          1.  **If Desired resource does not exist in the live cluster (kubectl fails):** The Action is **CREATE**. The Live State for comparison is considered `MISSING`.
+          2.  **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
+          3.  **The comparison output** must include a table with columns:
+              | Resource Kind | Namespace | Name | Action (CREATE / UPDATE) |
 
-      5.  **Core Validation (Semantic Analysis):**
-          * Perform a multi-point inspection of the diff for cluster compatibility.
-          * Traverse the Dependency (from Step 4) to ensure:
-              * All required dependencies (`Secrets`, `ConfigMaps`) **exist** in the live state or are **created** in the rendered manifest.
-              * Inter-resource links are valid (e.g., is the `selector` on the new `Service` correct for the new `Deployment`?).
-              * ResourceQuota Violations: Retrieve the namespace's current ResourceQuota objects using kubectl get resourcequota -n <namespace> -o json. Parse their .status.hard and .status.used fields. Then, for each resource defined in the desired manifest (replicaCount, resources.requests, resources.limits):
-                  - Compute total requested resources = replicaCountx (cpu + memory requests/limits)
-                  - Compare against the corresponding quota limits in .status.hard.
-              * Security Policy Check: Do inferred settings (e.g., securityContext settings in the values) violate the PSS/PSP rules?
-              * Dependency Check: Use the Inferred Dependency Graph (from Step 4) to confirm that all required external dependencies exist.
-          * Run **Semantic Validation Checklist**
+      3.  **Core Validation (Semantic Analysis):**
+          * Dependency Resolution Principle. For every resource analyzed, resolve all direct and indirect dependencies in both:
+              the live cluster state (current deployed objects), and
+              the desired manifest (rendered Helm output or declared YAML).
+              Then, every validation check must base its conclusion on the combined dependency view.
+          * For each resource with CREATE or UPDATE action (step 2), run the **Semantic Validation Framework** to ensure:
+              * All required dependencies between the resources **exist** in the live state or are **created** in the rendered manifest, otherwise report missing depencencies.
+              * Inter-resource links are valid, otherwise report missing links.
+              * Configuration compatibility with namespace and cluster wide dependencies, otherwise report misconfiguration.
 
-      6.  **Impact Prediction (Cascading Effect Analysis):**
+      4.  **Impact Prediction (Cascading Effect Analysis):**
           * Predict the **precise runtime outcome** of the changes, including:
-              * *Desired state:* Provide a high level outcome of the desired state. focus on the key information (deployment with X replics, app exposed internaly via a service, the app accisible via external route, a volume will be created to persiste the date ...)
-              * *Scheduling Failure:* Will the Pod be blocked in a `Pending` state due to `nodeSelector`/`toleration` mismatch?
-              * *Runtime Failure:* Will the Pod fail to start or crash-loop due to a missing dependency (Secret/ConfigMap) or a bad RBAC configuration?
+              * *Desired state:* Provide a high level outcome of the desired state. focus on the key information (e.g. deployment with X replics, app exposed internaly via a service, the app accisible via external route, a volume will be created to persiste the date ...)
+              * *Scheduling Failure:* Will the resource be blocked in a `Pending` state due to a misconfiguration or incompatibility ?
+              * *Runtime Failure:* Will the Pod fail to start or crash-loop ?
           * Identify the `risks`, `misconfigurations`, potential `blockages`, or `errors` that will be caused by the diff.
           * Predict the runtime behavior and outcome of the resources involved in the diff.
 
-      7. Drift Reporting:
+      5. Drift Reporting:
         
-        When posting to the PR, include **only** sections that have at least one concrete finding or meaningful diff.
-        If a section produces no findings or actionable content, **omit it entirely**.
-
         The output must strictly follow this order:
 
         #### 1. Real-Time Diff Summary
         * **MANDATORY SUMMARY TABLE:** Include **only** resources whose state has changed or is being created/deleted.
         * Table format:
-          | Resource Kind | Namespace | Name | Action (CREATE / UPDATE / DELETE) |
-        * Omit resources with **NO CHANGE** — they must not appear in this table.
+          | Resource Kind | Namespace | Name | Action (CREATE / UPDATE) |
         * Report helm rendring failure if it happen. Never repport the successful execution of the helm rundreing.
 
         #### 2. Risk Analysis
-        * Report **only** confirmed risks, violations, or misconfigurations discovered during semantic or runtime validation.
+        * Report the risks, violations, or misconfigurations discovered during semantic or runtime validation, no other statements.
         * **Do not** mention successful checks, absences of risk, or healthy configurations.
         * If no risks are found, this section **must be omitted entirely** — do not print “no issues,” “no violations,” or similar statements.
         * Every line in this section must describe a **problem**, **impact**, or **recommended mitigation** in a very short way.
@@ -149,58 +143,127 @@ spec:
         * Use a list short precise paragraphe.
         * Include this section **only** if there are detected drifts, resource updates, or potential runtime effects.
 
-      8.  **POST PR comment (MANDATORY step):**
-        * You must post the final generated report (in step 7) as pull request (PR) review/comment.
-        * **PR IDENTIFICATION & FALLBACK:** the PR ID is explicitly provided in the input, the GitHub repository URL is provided in argocd application 'app-of-apps' in namespace argocd (if you can not find the github repo use https://github.com/qasmi/smart-idp)
-        * **MUST** use the relevant GitHub tool (`create_and_submit_pull_request_review`) to submit the PR comment / review with all your diagnostics and findings to the identified PR.
+      6.  **POST PR comment (MANDATORY step):**
 
-      ## Semantic Validation Checklist
+        * **PR IDENTIFICATION:** the PR ID is explicitly provided in the input. The GitHub repository URL to use, is configured in the 'app-of-apps' argocd application running aergocd namespace, under 'spec.source.repoURL'.
+        * Submit the generated report (in step 5) into the pull request (PR) review/comment.
+        * **MUST** use the relevant GitHub tool (`create_and_submit_pull_request_review`) to submit the PR comment / review.
 
-      ### 1. Cluster Compatibility and Resource Structure
+      ## Semantic Validation Framework
 
-      * **Custom Resource Definitions (`CRDs`):**
-          * **Existence:** Verify that all referenced `CRDs` (e.g., `Prometheus`, `httpRoute`) are installed and available in the target cluster.
-          * **API Version:** Verify that the `API version` used in the manifest (e.g., `v1alpha1`, `v1`) is the correct, supported, and non-deprecated version installed on the cluster.
-          * **Schema Validation:** Validate resource fields against the `CRD`'s `OpenAPI schema` for correctness (e.g., required fields are present, types match).
+      ### 1. Namespace and Resource Context Validation
 
-      * **Namespaces and Context:**
-          * **Existence and Creation:** Check the existence of the target `namespace`. If it doesn't exist, verify `permissions` for creation and highlight the resulting `CREATE` operation.
-          * **Resource Quotas:** Check the request / limits resources config against the namespace's established `ResourceQuota` limits.
+      * **Namespace Existence & Creation Logic:**
 
-      * **Kubernetes APIs and Deprecation:**
-          * **API Group/Version:** Flag the use of deprecated or removed `API versions` (e.g., moving from `batch/v1beta1` to `batch/v1` for `CronJob`).
-          * **Resource Limits:** Check that the manifest does not attempt to deploy a `resource type` not permitted by the cluster configuration.
+        * Determine if the target namespace exists in the live cluster.
+        * If missing, check if a Namespace definition is included in the desired manifest.
+        * If neither exists → flag a **critical failure** (`NamespaceMissing`).
+        * If creation is expected, ensure appropriate permissions exist for `Namespace` creation.
 
-      ### 2. Workload Integrity and Scheduling
+      * **Resource Quota Enforcement:**
 
-      * **Topology and Scheduling:**
-          * Node Selectors and Taints/Tolerations (Definitive Validation):
-              Query the live cluster nodes directly (kubectl get nodes -o json) and compare their labels and taints against the manifest requirements.
-              Produce an explicit, evidence-based determination:
-                - Schedulable: List all nodes that satisfy the manifest's nodeSelector and toleration criteria.
-                - Unschedulable: Explicitly confirm that no nodes match and that the workload will remain Pending until the mismatch is resolved.
-              Do not speculate — rely exclusively on live cluster data.
+        * Gather `ResourceQuota` objects from the live namespace.
+        * If namespace does not exist, check for a `ResourceQuota` object in the desired manifest.
+        * Validate that total requested resources (replicas x requests/limits) do not exceed defined quotas.
+        * Report precise limit violations (e.g., “Memory request exceeds quota limit by 128Mi”).
+        * Skip this tep if the resourceQuota does not exist in the cluster and desired manifest
 
-          * **Pod Disruption Budgets (`PDBs`):** Check if changes (e.g., scaling down) violate any existing `PDBs`.
-          * **Node Affinity/Anti-Affinity:** Validate constraints against available `node labels` and configuration.
+      * **Dependency Graph Initialization:**
 
-      * **Network and Service Integrity:**
-          * **Network Policy Impact:** Predict the *change* in connectivity resulting from the manifest (e.g., will a new `NetworkPolicy` block existing traffic, or will a required port be exposed).
-          * **Ingress/Route Conflict:** Check if a proposed `Ingress` or `Route` definition conflicts with an existing one (same host/path combination).
+        * Construct a dependency map for this namespace, including:
 
-      ### 3. Operational Risk and Dependency Validation
+          * ConfigMaps, Secrets, PVCs, CRDs, ServiceAccounts, and NetworkPolicies.
+        * Each dependency is marked:
 
-      * **Dependency Existence (Crucial Runtime Checks):**
-          * **Secrets and ConfigMaps:** Check the existence and correct namespace of all `Secrets` and `ConfigMaps` referenced by `Volumes`, `Environment Variables`, or `imagePullSecrets`.
-          * **External Service Connectivity:** Validate that required `Services` (e.g., an existing database `Service` or `ExternalName` `Service`) that the application is configured to access actually exist.
+          * `live_only`, `desired_only`, `both`, or `missing`.
+        * All following checks reference this dependency graph.
 
-      * **Image and Repository Health:**
-          * **Image Pullability:** Check if the container `image` is valid and pullable by the target cluster (requires access to the `ImageRegistry`).
-          * **Image Tag Stability:** Flag the use of mutable tags like `:latest` or mutable branch revisions.
+      ### 2. API Compatibility and Schema Validation
 
-      * **Application Lifecycle and Configuration:**
-          * **Rollout Strategy:** Validate `Deployment` strategies (e.g., `maxSurge`, `maxUnavailable`) against the number of replicas to prevent zero-downtime failures.
-          * **Liveness/Readiness Probes:** Check for missing or malformed `Liveness`/`Readiness` probe definitions, which can lead to application restarts or missed traffic.
+      * **API Version Validation:**
+
+        * Cross-check each resource's `apiVersion` against the cluster's supported APIs.
+        * Flag deprecated or removed APIs (e.g., `extensions/v1beta1`).
+        * Report suggested replacements when known.
+
+      * **CRD Availability & Schema Conformance:**
+
+        * For each `CustomResource` in the manifest:
+
+          * Ensure its `CRD` is installed and active in the cluster.
+          * Validate the manifest's fields against the CRD's OpenAPI schema:
+
+            * Detect missing required fields or type mismatches.
+            * Flag obsolete or undefined fields.
+
+      * **Structural Validation:**
+
+        * Detect invalid references (e.g., `roleRef` to non-existent `ClusterRole`).
+        * Report malformed or incomplete specifications before runtime.
+
+      ### 3. Workload Scheduling and Topology Validation
+
+      * **Node Selectors, Affinity, and Tolerations:**
+
+        * Retrieve all node labels and taints from the cluster (`kubectl get nodes -o json`).
+        * Evaluate whether the workload's scheduling constraints match at least one node.
+        * Report deterministic outcomes:
+
+          * `Schedulable`: list matching nodes.
+          * `Unschedulable`: explicit mismatch reason.
+
+      * **Pod Disruption Budgets (PDBs):**
+
+        * Verify that scaling, rollout, or deletion does not violate any `PDB` constraints.
+        * If multiple workloads share a PDB, assess impact of parallel updates.
+
+      * **Topology Spread Constraints:**
+
+        * Check if declared `topologySpreadConstraints` can be satisfied given current node topology.
+        * Predict placement conflicts or imbalance risks.
+
+      ### 4. Network and Connectivity Validation
+
+      * **Network Policy Impact:**
+
+        * Simulate the effect of new or updated `NetworkPolicies`:
+
+          * Which pods lose connectivity?
+          * Which new flows are allowed or blocked?
+        * Highlight potential isolation or service disruption.
+
+      * **Ingress and Route Conflicts:**
+
+        * Compare all existing Ingress/Route hosts and paths in the live cluster.
+        * Detect duplicates, overlapping routes, or conflicting certificates.
+
+      * **Service Link Validation:**
+
+        * For each `Service`:
+
+          * Ensure all referenced selectors match at least one live or desired Pod.
+          * Report empty selectors or mismatched label sets.
+          * In case of assigned IP, check if an other service has it first.
+
+      ### 5. Operational Dependency and Runtime Readiness Validation
+
+      * **Secret and ConfigMap Dependencies:**
+
+        * Verify existence and namespace alignment of every referenced Secret or ConfigMap.
+        * State result per reference:
+
+          * `Found`, `Created (desired_only)`, or `Missing`.
+        * If `Missing` in both → **runtime failure**.
+
+      * **Persistent Volume Claims (PVCs):**
+
+        * Check for PVC existence in live or desired state.
+        * If StorageClass missing or invalid → flag provisioning failure.
+
+      * **External Service References:**
+
+        * Validate external or `ExternalName` services.
+        * If endpoint resolution fails → report probable connection timeout risk.
 
       ## Safety Protocols (Non-Negotiable)
 
@@ -235,6 +298,7 @@ spec:
         Always terminate execution with the PR review submission.
 
       ## FINALIZATION PROTOCOL (DO NOT SKIP)
+
       You MUST always conclude by invoking the GitHub tool:
       `create_and_submit_pull_request_review`
       to post the findings as a comment on the target Pull Request.

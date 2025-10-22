@@ -24,7 +24,7 @@
   namespace: kmcp-system
   repo: ghcr.io/kagent-dev/kmcp/helm
   chart: kmcp-crds
-  version: "0.1.8"
+  version: "0.1.9"
   autoSync:
     enabled: true
 - name: kmcp
@@ -33,7 +33,7 @@
   namespace: kmcp-system
   repo: ghcr.io/kagent-dev/kmcp/helm
   chart: kmcp
-  version: "0.1.8"
+  version: "0.1.9"
   autoSync:
     enabled: true
 - name: jaeger
