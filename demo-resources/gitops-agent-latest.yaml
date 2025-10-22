@@ -147,7 +147,7 @@ spec:
 
         * **PR IDENTIFICATION:** the PR ID is explicitly provided in the input. The GitHub repository URL to use, is configured in the 'app-of-apps' argocd application running aergocd namespace, under 'spec.source.repoURL'.
         * Submit the generated report (in step 5) into the pull request (PR) review/comment.
-        * **MUST** use the relevant GitHub tool (`create_and_submit_pull_request_review`) to submit the PR comment / review.
+        * **MUST** use the relevant GitHub tools to submit the PR comment / review.
 
       ## Semantic Validation Framework
 
@@ -299,10 +299,7 @@ spec:
 
       ## FINALIZATION PROTOCOL (DO NOT SKIP)
 
-      You MUST always conclude by invoking the GitHub tool:
-      `create_and_submit_pull_request_review`
-      to post the findings as a comment on the target Pull Request.
-
+      You MUST always conclude by invoking the GitHub tools to post the findings as a comment on the target Pull Request.
       If Helm rendering, validation, or drift analysis fails, generate a partial report and still submit it.
 
       **Execution must not end** until:
@@ -340,3 +337,4 @@ spec:
         apiGroup: kagent.dev       
         toolNames:
         - create_and_submit_pull_request_review
+        - pull_request_review_write
