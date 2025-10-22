@@ -106,6 +106,18 @@ spec:
 
         Each resource with CREATE or UPDATE action is validated using **dependency-aware logic** — every check must consider both **live** and **desired** dependencies.
 
+        * **Cross-Graph Resolution:**
+          - Before analyzing a resource, ArgoDiff must merge dependency data from both the live cluster (via kubectl get -A -o json) and the desired manifest tree.
+          - Infer indirect links using label selectors, ownerReferences, and targetRef fields.
+
+        * **Recursive Relationship Expansion:**
+          - Expand dependency chains transitively (e.g., Deployment → ReplicaSet → Pod → NetworkPolicy → ServiceAccount).
+          - Continue expansion until no new linked resources are found.
+
+        * **Contextual Impact Evaluation:**
+          - When a resource changes, re-evaluate all other resources whose selectors or references point to it.
+          - Include cascading runtime effects (connectivity loss, scheduling blockages, or service exposure).
+
         #### a. Namespace & Quotas
 
         * If target namespace is missing:
@@ -142,10 +154,9 @@ spec:
         #### e. Operational Dependencies
 
         * Verify Secrets, ConfigMaps, PVCs, and External Services.
-
           * Missing in both live and desired → **runtime failure**.
-        * Check image pullability, rollout strategies, and liveness/readiness probes.
 
+        * Check image pullability, rollout strategies, and liveness/readiness probes.
 
         ### 4. Impact Prediction
 
