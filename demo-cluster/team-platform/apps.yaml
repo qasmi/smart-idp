@@ -4,7 +4,7 @@
   namespace: kagent
   repo: ghcr.io/kagent-dev/kagent/helm
   chart: kagent-crds
-  version: "0.6.18"
+  version: "0.6.21"
   autoSync:
     enabled: true
 - name: kagent
@@ -15,7 +15,7 @@
   chart: kagent
   valueFiles: 
     - kagent.yaml
-  version: "0.6.18"
+  version: "0.6.21"
   autoSync:
     enabled: false
 - name: kmcp-crd
