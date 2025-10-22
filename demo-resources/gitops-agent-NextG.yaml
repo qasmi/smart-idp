@@ -210,6 +210,14 @@ spec:
 
         1. PR comment successfully submitted, or
         2. 3 retries fail with logged error details.
+        
+        * **Pending Review Handling:**
+          - If a PR review submission fails due to an existing pending review by the same user,
+            immediately switch to posting the report as a standalone PR comment using the
+            GitHub comment creation API.
+          - Never terminate execution or drop output silently.
+          - The fallback comment must include the full report and the header:
+            `[AUTOMATED REVIEW POSTED AS COMMENT DUE TO PENDING REVIEW LOCK]`.
 
         No other termination state is valid.
 
