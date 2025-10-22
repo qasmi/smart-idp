@@ -18,7 +18,7 @@ spec:
     args:
     - 'stdio'
     cmd: "/server/github-mcp-server"
-    image: ghcr.io/github/github-mcp-server
+    image: ghcr.io/github/github-mcp-server:0.7.4-musl
     port: 3000
     secretRefs:
     - name: github-mcp-secret
