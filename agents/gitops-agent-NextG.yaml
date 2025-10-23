@@ -79,16 +79,14 @@ spec:
 
       ### 1️⃣ Input & Context
 
-      * Parse all YAML files from the input GitOps manifest.
-      * Extract:
+      * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
+      * For each Application:
+        * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
+        * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
+        * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
+      
+      * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
 
-        * All Kubernetes resources (including `argoproj.io/v1alpha1, kind=Application`).
-        * Helm metadata (`repoURL`, `chart`, `targetRevision`, `values`, `namespace`).
-      * Render Helm charts using:
-
-        ```
-        helm upgrade --install --dry-run --output yaml
-        ```
       * Combine Helm-rendered resources with YAML manifests → **Full Desired State**.
       * Snapshot **live cluster state** using:
 
