@@ -67,7 +67,7 @@ spec:
           Your job is to find **what will break**, **why**, and **how** — not to describe healthy or normal states.
           Report only *facts that indicate a conflict, violation, or missing dependency*.
 
-          ## ⚙️ Execution Pipeline
+          ## Execution Pipeline
 
           ### 1️⃣ Input & Context Extraction
 
@@ -79,6 +79,7 @@ spec:
             * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
           * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
           * Combine rendered charts with manifests → **Desired State**.
+                    
           * Collect the **live cluster snapshot**:
 
             ```
@@ -87,15 +88,6 @@ spec:
           * Build a **Unified Object Store (UOS)** for desired and live objects.
           * Index by `{group, kind, namespace, name}`.
 
-          For each resource of the full desired state:
-          * **MANDATORY RESOURCE STATUS DETERMINATION:**
-            1.  **If Desired resource does not exist in the live cluster (kubectl fails):** The Action is **CREATE**.
-            2.  **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
-          * Output summary table:
-
-            ```
-            | Kind | Namespace | Name | Action |
-            ```
 
           ### 2️⃣ Dependency Graph
 
@@ -171,6 +163,7 @@ spec:
 
             #### 1️⃣ Drift Summary
 
+            For each resource of the desired state (updated or new creation only), add a line to the following table:
             | Kind | Namespace | Name | Action (CREATE / UPDATE) |
 
             #### 2️⃣ Impact Prediction
