@@ -45,11 +45,11 @@ spec:
   - chart: dao-2048
     helm:
       values: |
-        replicaCount: 3
+        replicaCount: 1
 
         resources: 
           limits:
-            cpu: 500m
+            cpu: 1500m
             memory: 128Mi
           requests:
             cpu: 100m
@@ -66,6 +66,7 @@ spec:
       
         service:
           type: LoadBalancer
+          loadBalancerIP: "172.18.250.0"
 
     repoURL: http://daocloud.github.io/dao-2048/
     targetRevision: "1.2.1"
