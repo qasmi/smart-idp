@@ -71,23 +71,36 @@ spec:
 
           ### 1️⃣ Input & Context Extraction
 
-          * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
-          * For each Application extract and normalize Helm parameters from `.spec.source`:
-            * **Required fields:**
-              * `repoURL` - Helm repo or Git URL
-              * `chart` - chart name or local path
-              * `targetRevision` - version/tag (`latest` if empty)
-              * `values` - merged from `.helm.values` and `.helm.parameters`
-              * `namespace` - from `.spec.destination.namespace` (default: `default`)
-            * **Normalization rules:**
-              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
-              * Merge Helm values and parameters into a single `--values`/`--set` structure.
-            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
-            * **Must** use --dry-run option, do not run helm upgrade without the option.
-            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
-           
-          * Combine rendered charts with manifests → **Desired State**.
-                    
+          * Parse all YAMLs, focusing on `argoproj.io/v1alpha1, kind=Application`.
+
+          * For each Application:
+
+            * Extract and normalize fields:
+
+              ```
+              repoURL, chart, targetRevision, values, namespace
+              ```
+            * Merge `.helm.values` and `.helm.parameters` into a single Helm configuration.
+            * Validate `chart` reference:
+
+              * If missing repository prefix (e.g. “dao-2048”), **auto-prepend** the inferred repo name from `repoURL` (e.g., `dao-2048/dao-2048`).
+              * If invalid, mark as `FAILED_EXTRACTION` and continue.
+            * Always run Helm rendering as:
+
+              ```
+              helm upgrade <release> <repo/chart> -n <namespace> \
+              --version <targetRevision> \
+              [--values ... or --set ...] \
+              --install --dry-run --timeout 30s --output yaml
+              ```
+            * If Helm rendering fails:
+
+              * Retry once.
+              * If still failing, record the `stderr` excerpt and mark the chart as `RENDER_FAILED`, but **continue** with other apps.
+              * Include the Helm error in the final Drift Summary under the failed Application.
+
+          * Combine rendered Helm manifests + static YAML → **full desired state**.
+
           * Collect the **live cluster snapshot**:
 
             ```
@@ -169,22 +182,22 @@ spec:
 
           Output only sections with findings, in this order:
 
-            #### 1️⃣ Drift Summary
+          #### 1️⃣ Drift Summary
 
-            For each resource of the desired state (updated or new creation only), add a line to the following table:
-            | Kind | Namespace | Name | Action (CREATE / UPDATE) |
+          For each resource of the desired state (updated or new creation only), add a line to the following table:
+          | Kind | Namespace | Name | Action (CREATE / UPDATE) |
 
-            #### 2️⃣ Impact Prediction
+          #### 2️⃣ Impact Prediction
 
-            Concise bullet list of runtime consequences (if any).
+          Concise bullet list of runtime consequences.
 
-            #### 3️⃣ Risk Analysis
+          #### 3️⃣ Risk Analysis
 
-            Only confirmed problems:
+          Only confirmed problems:
 
-            ```
-            Problem → Impact → Mitigation
-            ```
+          ```
+          Problem → Impact → Mitigation
+          ```
 
           Do not mention absences of risk or successful checks.
 
