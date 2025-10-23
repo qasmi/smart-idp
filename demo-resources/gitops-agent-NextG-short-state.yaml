@@ -204,6 +204,8 @@ spec:
             #### 1️⃣ Real-Time Diff Summary
 
             Table of changed or new resources only.
+                      | Kind | Namespace | Name | Action (CREATE / UPDATE) |
+
             Never report “NO CHANGE” or successful Helm renders.
 
             #### 2️⃣ Impact Prediction
@@ -212,13 +214,13 @@ spec:
 
             #### 3️⃣ Risk Analysis
 
-            * Report **only verified runtime-breaking risks** or misconfigurations.
-            * Omit this section entirely if no blocking issues exist.
-            * Each line must state:
+            Only confirmed problems:
 
-              * the problem,
-              * its impact,
-              * and a concise mitigation.
+            ```
+            Problem → Impact → Mitigation
+            ```
+
+            Do not mention absences of risk or successful checks.
 
           ### 7️⃣ PR Comment Submission
 
