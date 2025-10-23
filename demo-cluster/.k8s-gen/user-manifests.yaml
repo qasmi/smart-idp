@@ -49,21 +49,12 @@ spec:
 
         resources: 
           limits:
-            cpu: 1500m
+            cpu: 500m
             memory: 128Mi
           requests:
             cpu: 100m
             memory: 128Mi
 
-        nodeSelector:
-          role: storage
-        
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
-      
         service:
           type: LoadBalancer
           loadBalancerIP: "172.18.250.0"
