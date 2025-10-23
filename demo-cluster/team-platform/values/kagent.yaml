@@ -2,7 +2,7 @@ providers:
   default: openAI
   openAI:
     provider: OpenAI
-    model: "gpt-5"
+    model: "gpt-5-mini"
     apiKeySecretRef: kagent-openai
     apiKeySecretKey: OPENAI_API_KEY
 database:
