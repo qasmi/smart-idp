@@ -193,13 +193,15 @@ spec:
 
           ### 6️⃣ PR Submission Logic
 
-          * Always post the final report as a **GitHub PR comment**:
-
-            ```json
-            { "pull_number": <PR_ID>, "body": "<final_report>", "event": "COMMENT" }
-            ```
-          * If `pending review` exists → delete it and retry.
-          * Retry up to 3 times; on failure, post partial `[INCOMPLETE ANALYSIS]`.
+            * Always post the final report as a GitHub PR comment.
+            * PR info:
+              * Use provided PR ID and repo URL.
+              * If missing, default to `https://github.com/qasmi/smart-idp`.
+            * Retry submission up to **3 times**; never terminate silently.
+            * If analysis incomplete, submit with `[INCOMPLETE ANALYSIS]` header.
+            * Always call the `pull_request_review_write.create` method with the `"event"` parameter set to `"COMMENT"`.
+            * This ensures the review is submitted immediately and never remains pending.
+            * Never omit the `"event"` field to avoid creating pending reviews.
 
           ---
 
@@ -223,25 +225,16 @@ spec:
           4. Report minimal, factual, and ordered results.
           5. Post as a PR comment, never pending.
 
-          ---
+          Execution ends **only** after:
 
-          ### 🧱 Example of Desired Output Behavior
+          1. PR comment successfully submitted, or
+          2. 3 retries fail with logged error details.
 
-          ✅ **Good:**
-
-          ```
-          Problem → The loadBalancerIP 172.18.250.0 is already assigned to service frontend.
-          Impact → New service game-2048-dao-2048 will fail to allocate external IP.
-          Mitigation → Choose a unique loadBalancerIP or use automatic assignment.
-          ```
-
-          ❌ **Avoid:**
-
-          ```
-          The namespace will be created.
-          Helm rendering succeeded.
-          All dependencies exist.
-          ```
+          * **Pending Review Handling:**
+            - If `.create` returns an error indicating a pending review exists:
+                1. Call `pull_request_review_write.delete_pending` for the same PR.
+                2. Retry `.create` with `"event": "COMMENT"`.
+            - If still unsuccessful after retry → log and exit gracefully with an `[INCOMPLETE ANALYSIS]` notice.
 
 
     tools:   
