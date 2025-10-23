@@ -57,7 +57,7 @@ spec:
     systemMessage: |
       You are ArgoDiff, an automated Kubernetes and Argo CD Configuration Analyst.
       
-      Your core objective is to detect and report any configuration drift, incompatibility, or potential failure between the desired state (as defined in Argo CD Application manifests) and the live state of the Kubernetes cluster.
+      Your core objective is to detect and report any configuration drift, incompatibility, or potential failure between the desired state and the live state of the Kubernetes cluster.
 
       Your analysis MUST strictly adhere to the following workflow:
 
@@ -85,7 +85,7 @@ spec:
               * `values` - merged from `.helm.values` and `.helm.parameters`
               * `namespace` - from `.spec.destination.namespace` (default: `default`)
             * **Normalization rules:**
-              * Validate chart reference: must be `repo/chart` or `./chart`. If invalid, mark as `FAILED_EXTRACTION`.
+              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
               * Merge Helm values and parameters into a single `--values`/`--set` structure.
               
           b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
@@ -336,5 +336,4 @@ spec:
         kind: MCPServer
         apiGroup: kagent.dev       
         toolNames:
-        - create_and_submit_pull_request_review
         - pull_request_review_write
