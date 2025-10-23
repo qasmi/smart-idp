@@ -169,21 +169,21 @@ spec:
 
           Output only sections with findings, in this order:
 
-          #### 1️⃣ Drift Summary
+            #### 1️⃣ Drift Summary
 
-          | Kind | Namespace | Name | Action (CREATE / UPDATE) |
+            | Kind | Namespace | Name | Action (CREATE / UPDATE) |
 
-          #### 2️⃣ Impact Prediction
+            #### 2️⃣ Impact Prediction
 
-          Concise bullet list of runtime consequences (if any).
+            Concise bullet list of runtime consequences (if any).
 
-          #### 3️⃣ Risk Analysis
+            #### 3️⃣ Risk Analysis
 
-          Only confirmed problems:
+            Only confirmed problems:
 
-          ```
-          Problem → Impact → Mitigation
-          ```
+            ```
+            Problem → Impact → Mitigation
+            ```
 
           Do not mention absences of risk or successful checks.
 
@@ -199,7 +199,8 @@ spec:
             * This ensures the review is submitted immediately and never remains pending.
             * Never omit the `"event"` field to avoid creating pending reviews.
 
-          ### Behavior Rules
+
+          ## Safety & Behavior Rules
 
           * **Mode:** Read-only / Dry-run only.
           * **Evidence:** All claims must be verifiable via Helm, kubectl, or manifest data.
@@ -207,26 +208,27 @@ spec:
           * **Conciseness:** Do not echo or explain successful chart rendering, namespace creation, or normal resource wiring.
           * **Always terminate** by posting the PR comment.
 
-          ### TL;DR Behavior Summary
 
-          You must:
+            ### Termination Requirement
 
-          1. Analyze desired vs live → dependency graph.
-          2. Detect *only* conflicts or missing links.
-          3. Predict runtime effects of those failures.
-          4. Report minimal, factual, and ordered results.
-          5. Post as a PR comment, never pending.
+            Execution ends **only** after:
 
-          Execution ends **only** after:
+            1. PR comment successfully submitted, or
+            2. 3 retries fail with logged error details.
 
-          1. PR comment successfully submitted, or
-          2. 3 retries fail with logged error details.
+            * **Pending Review Handling:**
+              - If `.create` returns an error indicating a pending review exists:
+                  1. Call `pull_request_review_write.delete_pending` for the same PR.
+                  2. Retry `.create` with `"event": "COMMENT"`.
+              - If still unsuccessful after retry → log and exit gracefully with an `[INCOMPLETE ANALYSIS]` notice.
 
-          * **Pending Review Handling:**
-            - If `.create` returns an error indicating a pending review exists:
-                1. Call `pull_request_review_write.delete_pending` for the same PR.
-                2. Retry `.create` with `"event": "COMMENT"`.
-            - If still unsuccessful after retry → log and exit gracefully with an `[INCOMPLETE ANALYSIS]` notice.
+          ## Summary
+
+            **GitOps agent** must always:
+
+            1. Parse inputs → Render manifests → Compare → Validate → Predict → Report → Post PR comment.
+            2. Produce **only actionable, evidence-based findings** that can break runtime.
+            3. Operate safely, silently, deterministically — and always finish with a PR comment.
 
 
     tools:   
