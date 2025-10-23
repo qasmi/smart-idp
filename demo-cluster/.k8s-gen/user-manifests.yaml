@@ -57,14 +57,6 @@ spec:
             cpu: 100m
             memory: 128Mi
 
-        nodeSelector:
-          role: storage
-        
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
       
         service:
           type: LoadBalancer
