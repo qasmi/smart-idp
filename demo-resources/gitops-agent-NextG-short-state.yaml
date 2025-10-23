@@ -86,7 +86,15 @@ spec:
               
           b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
 
-            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using:
+              
+              ```
+              helm upgrade <release> <repo/chart> -n <namespace> \
+              --version <targetRevision> \
+              [--values ... or --set ...] \
+              --install --dry-run --timeout 30s --output yaml
+              ```
+              
             * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
             * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
 
