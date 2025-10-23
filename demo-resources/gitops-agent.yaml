@@ -149,10 +149,9 @@ spec:
 
       * **Namespace Existence & Creation Logic:**
 
-        * Determine if the target namespace exists in the live cluster.
-        * If missing, check if a Namespace definition is included in the desired manifest.
-        * If neither exists → flag a **critical failure** (`NamespaceMissing`).
-        * If creation is expected, ensure appropriate permissions exist for `Namespace` creation.
+        * Determine if the target namespace is missing in the live cluster and the desired manifest.
+        * If not, check all namespace level dependencies of the resources.
+        * Ensure the existing og the dependencies and compatibility.
 
       * **Resource Quota Enforcement:**
         
