@@ -160,9 +160,12 @@ spec:
         * Validate resource requests/limits against:
           * Live `ResourceQuota` (if namespace exists), or
           * Desired `ResourceQuota` (if defined).
-        * Validate that total requested resources (replicas x requests/limits) do not exceed the ResourceQuota.
+        * ResourceQuota Violations: 
+          * Retrieve ResourceQuota's fields and validate each quota aginst the input resource, e.g.:
+            * Compute total requested resources = replicaCountx (cpu + memory requests/limits)
+            * Compare against the corresponding quota limits in .status.hard.
         * Report precise limit violations.
-        * Skip this step if the resourceQuota does not exist in the cluster and desired manifest.
+        * Skip this step if no resourceQuota exist in the cluster or desired manifest.
 
       * **Dependency Graph Initialization:**
 
