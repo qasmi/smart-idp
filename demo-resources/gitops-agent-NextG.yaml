@@ -72,12 +72,20 @@ spec:
           ### 1️⃣ Input & Context Extraction
 
           * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
-          * For each Application:
-
-            * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
-            * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
-            * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
-          * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+          * For each Application extract and normalize Helm parameters from `.spec.source`:
+            * **Required fields:**
+              * `repoURL` - Helm repo or Git URL
+              * `chart` - chart name or local path
+              * `targetRevision` - version/tag (`latest` if empty)
+              * `values` - merged from `.helm.values` and `.helm.parameters`
+              * `namespace` - from `.spec.destination.namespace` (default: `default`)
+            * **Normalization rules:**
+              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
+              * Merge Helm values and parameters into a single `--values`/`--set` structure.
+            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * **Must** use --dry-run option, do not run helm upgrade without the option.
+            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
+           
           * Combine rendered charts with manifests → **Desired State**.
                     
           * Collect the **live cluster snapshot**:
