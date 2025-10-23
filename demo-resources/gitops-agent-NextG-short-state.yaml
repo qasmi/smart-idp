@@ -71,28 +71,25 @@ spec:
 
           ### 1️⃣ Input & Context Extraction
 
-          * Parse all YAMLs, focusing on `argoproj.io/v1alpha1, kind=Application`.
+          a. Desired State Extraction:
 
-          * For each Application:
+            * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
+            * **Required fields:**
+              * `repoURL` - Helm repo or Git URL
+              * `chart` - chart name or local path
+              * `targetRevision` - version/tag (`latest` if empty)
+              * `values` - merged from `.helm.values` and `.helm.parameters`
+              * `namespace` - from `.spec.destination.namespace` (default: `default`)
+            * **Normalization rules:**
+              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
+              * Merge Helm values and parameters into a single `--values`/`--set` structure.
+              
+          b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
 
-            * Extract and normalize fields:
+            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
+            * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
 
-              ```
-              repoURL, chart, targetRevision, values, namespace
-              ```
-            * Merge `.helm.values` and `.helm.parameters` into a single Helm configuration.
-            * Validate `chart` reference:
-
-              * If missing repository prefix (e.g. “dao-2048”), **auto-prepend** the inferred repo name from `repoURL` (e.g., `dao-2048/dao-2048`).
-              * If invalid, mark as `FAILED_EXTRACTION` and continue.
-            * Always run Helm rendering as:
-
-              ```
-              helm upgrade <release> <repo/chart> -n <namespace> \
-              --version <targetRevision> \
-              [--values ... or --set ...] \
-              --install --dry-run --timeout 30s --output yaml
-              ```
             * If Helm rendering fails:
 
               * Retry once.
@@ -101,68 +98,90 @@ spec:
 
           * Combine rendered Helm manifests + static YAML → **full desired state**.
 
-          * Collect the **live cluster snapshot**:
+
+          ### 2️⃣ Diff & Target Set Discovery
+
+          * Compare desired vs live cluster to find **affected resources**:
 
             ```
-            kubectl get all,ingress,networkpolicy,serviceaccount,resourcequota,crd -A -o json
+            CREATE → exists in desired, missing in live
+            UPDATE → exists in both but differs
             ```
-          * Build a **Unified Object Store (UOS)** for desired and live objects.
-          * Index by `{group, kind, namespace, name}`.
+          * Limit further validation to these affected resources.
+          * For each, record `{group, kind, namespace, name}`.
 
+          ---
 
-          ### 2️⃣ Dependency Graph
+          ### 3️⃣ Context-Aware Dependency Retrieval
 
-          Construct a dependency graph by detecting **explicit** and **implicit** links:
+          For each affected resource, **recursively collect dependencies** (explicit and implicit) from the live cluster **only** where relevant:
 
-          * Explicit (field-based): Secrets, ConfigMaps, PVCs, ServiceAccounts, Roles, Services, etc.
-          * Implicit (inferred):
-            Service ↔ Pod (label selectors)
-            Ingress ↔ Service (backend/host)
-            NetworkPolicy ↔ Pod (selectors)
-            NodeSelectors ↔ Node labels
-            PSA, ResourceQuota, StorageClass, CRDs
-            Helm ownership annotations
-            Webhook targets (by match rules)
+          * **Explicit Links:**
 
-          Mark each dependency:
+            * `.spec.template.spec.volumes[].secret|configMap`
+            * `.envFrom`, `.env.valueFrom`
+            * `.serviceAccountName`
+            * `.persistentVolumeClaim.claimName`
+            * RBAC: Roles, RoleBindings, ClusterRoles.
+          * **Implicit Links:**
+
+            * Service ↔ Pod/Deployment (via selectors)
+            * Ingress ↔ Service
+            * NetworkPolicy ↔ Pod/Namespace
+            * PVC ↔ StorageClass
+            * NodeSelector ↔ Node labels
+
+          For each dependency, fetch only:
 
           ```
-          live_only | desired_only | both | missing
+          kubectl get <kind> <name> -n <namespace> -o json
           ```
 
-          ### 3️⃣ Semantic Validation (Context-Aware)
+          Build a **minimal dependency subgraph** per resource:
 
-          For each **CREATE** or **UPDATE** resource:
+          ```
+          affected_resource → [linked live dependencies]
+          ```
+
+          ---
+
+          ### 4️⃣ Semantic Validation (Dependency-Scoped)
+
+          Perform deterministic validation using this localized graph:
 
           * **Namespace & ResourceQuota:**
-            Validate requested CPU/memory vs live or desired quotas.
-            Only report if exceeding limits or if namespace missing.
 
-          * **API & Schema:**
-            Flag unsupported or deprecated GVKs.
-            Report invalid or missing CRDs only.
+            * Validate only if namespace is new or changed.
+            * Compare requested CPU/memory against live or desired quota.
+
+          * **API & CRD Schema:**
+
+            * Verify supported versions, detect deprecated or missing CRDs.
 
           * **Scheduling:**
-            Confirm workload schedulable on available nodes.
-            Report only if **no nodes** satisfy constraints.
 
-          * **Storage:**
-            Check PVC ↔ StorageClass binding; flag if invalid or unprovisionable.
+            * Check nodeSelector/tolerations vs live nodes only if the workload changes.
 
-          * **Network & Connectivity:**
+          * **Networking:**
 
-            * Service: detect *port conflicts*, *selector mismatches*, or *duplicate clusterIPs*.
-            * LoadBalancer: verify that `loadBalancerIP` isn’t already claimed by another live Service.
-            * Ingress: detect duplicate host/path combinations, TLS secret conflicts.
-            * NetworkPolicy: identify blocked traffic paths between dependent resources.
+            * Detect:
+
+              * Duplicate loadBalancerIP among live Services.
+              * Ingress host/path conflicts.
+              * Broken Service ↔ Pod selectors.
+            * Run targeted `kubectl get service -A` or `kubectl get ingress -A` *only for the relevant kind*.
 
           * **Dependencies:**
-            Report only missing or mismatched Secrets, ConfigMaps, PVCs, ServiceAccounts.
 
-          * **Security / Admission:**
-            Report only PodSecurityAdmission or RBAC violations, or likely webhook rejections.
+            * Validate existence and namespace of referenced Secrets, ConfigMaps, PVCs, and ServiceAccounts.
+            * Flag missing or mismatched ones only.
 
-          ### 4️⃣ Runtime Impact Prediction (Concise)
+          * **Security & Admission:**
+
+            * Check for PSA violations, missing RBAC roles, or webhook rejections (based on known policies).
+
+
+          ### 5️⃣ Runtime Impact Prediction
 
           List **only meaningful runtime consequences** caused by real findings:
 
@@ -178,30 +197,30 @@ spec:
 
           Never describe healthy or valid conditions.
 
-          ### 5️⃣ Report Format
+          ### 6️⃣ Reporting Format
 
           Output only sections with findings, in this order:
 
-          #### 1️⃣ Drift Summary
+            #### 1️⃣ Real-Time Diff Summary
 
-          For each resource of the desired state (updated or new creation only), add a line to the following table:
-          | Kind | Namespace | Name | Action (CREATE / UPDATE) |
+            Table of changed or new resources only.
+            Never report “NO CHANGE” or successful Helm renders.
 
-          #### 2️⃣ Impact Prediction
+            #### 2️⃣ Impact Prediction
 
-          Concise bullet list of runtime consequences.
+            Short, developer-friendly list describing runtime outcomes of the drift.
 
-          #### 3️⃣ Risk Analysis
+            #### 3️⃣ Risk Analysis
 
-          Only confirmed problems:
+            * Report **only verified runtime-breaking risks** or misconfigurations.
+            * Omit this section entirely if no blocking issues exist.
+            * Each line must state:
 
-          ```
-          Problem → Impact → Mitigation
-          ```
+              * the problem,
+              * its impact,
+              * and a concise mitigation.
 
-          Do not mention absences of risk or successful checks.
-
-          ### 6️⃣ PR Submission Logic
+          ### 7️⃣ PR Comment Submission
 
             * Always post the final report as a GitHub PR comment.
             * PR info:
