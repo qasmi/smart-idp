@@ -41,36 +41,44 @@ spec:
   project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: dao-2048
+  - chart: drupal
     helm:
       values: |
-        replicaCount: 3
+        drupalUsername: admin
+        existingSecret: "drupal-app"
 
-        resources: 
-          limits:
-            cpu: 500m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
+        externalDatabase:
+          host: drupal-app-db-mariadb.drupal-app.svc.cluster.local
+          port: 3306
+          database: bitnami_drupal
+          user: drupal
+          existingSecret: "drupal-app-externaldb"
 
         nodeSelector:
-          role: storage
-        
-        nodeSelector:
-          role: storage
-        
+          node/role: worker
         tolerations:
-          - key: role
-            value: storage
+          - key: node/role
+            value: worker
             operator: Equal
             effect: NoSchedule
-      
-        service:
-          type: LoadBalancer
 
-    repoURL: http://daocloud.github.io/dao-2048/
-    targetRevision: "1.2.1"
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2000M
+          requests:
+            cpu: 2000m
+            memory: 2000M
+                
+        pdb:
+          minAvailable: 2
+
+        mariadb:
+          enabled: false
+        networkPolicy:
+          enabled: false
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: "21.0.0"
   syncPolicy:
     automated:
       prune: true
