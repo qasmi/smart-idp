@@ -53,7 +53,7 @@ spec:
           - risk
           - security
 
-    modelConfig: ng-model-config
+    modelConfig: default-model-config
     systemMessage: |
           ## **GitOps Semantic Validation Agent**
 
