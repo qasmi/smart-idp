@@ -170,7 +170,8 @@ spec:
 
           * **Scheduling:**
 
-            * Check nodeSelector/tolerations vs live nodes labels/taints only.
+            * Check nodeSelector vs live nodes labels configuration
+            * Check tolerations vs live nodes taints configuration.
 
           * **Networking:**
 
