@@ -162,7 +162,7 @@ spec:
           * **Namespace & ResourceQuota:**
 
             * Validate only if namespace is new or changed.
-            * Compare requested CPU/memory against live or desired resourceQuota.
+            * Compare requeste/limit CPU/memory against live or desired resourceQuota.
 
           * **API & CRD Schema:**
 
