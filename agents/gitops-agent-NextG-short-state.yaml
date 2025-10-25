@@ -71,53 +71,25 @@ spec:
 
           ### 1️⃣ Input & Context Extraction
 
-          a. Desired State Extraction:
+            * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
+            * For each Application:
 
-            * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
-            * **Required fields:**
-              * `repoURL` - Helm repo or Git URL
-              * `chart` - chart name
-              * `targetRevision` - version/tag (`latest` if empty)
-              * `values` - merged from `.helm.values` and `.helm.parameters`
-              * `namespace` - from `.spec.destination.namespace` (default: `default`)
-            * **Normalization rules:**
-              * Merge Helm values and parameters into a single `--values`/`--set` structure.
-              
-          b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
-
-            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using:
-              
-              ```
-              helm upgrade <release> <repo/chart> -n <namespace> \
-              --version <targetRevision> \
-              [--values ... or --set ...] \
-              --install --dry-run --timeout 30s --output yaml
-              ```
-
-            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
-            * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
-
-            * If Helm rendering fails:
-
-              * Retry once.
-              * If still failing, record the `stderr` excerpt and mark the chart as `RENDER_FAILED`, but **continue** with other apps.
-              * Include the Helm error in the final Drift Summary under the failed Application.
-
-          * Combine rendered Helm manifests + static YAML → **full desired state**.
-
+              * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
+              * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
+              * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
+            * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * Combine rendered Helm resources with the input manifest → full desired state.
 
           ### 2️⃣ Diff & Target Set Discovery
 
           * Compare desired vs live cluster to find **affected resources**:
 
             ```
-            CREATE → exists in desired, missing in live (no resource in the list of the live cluster resources)
-            UPDATE → exists in both but differs (get resource yaml detail detect changes)
+            CREATE → exists in desired, missing in live
+            UPDATE → exists in both but differs
             ```
           * Limit further validation to these affected resources.
           * For each, record `{group, kind, namespace, name}`.
-
-          ---
 
           ### 3️⃣ Context-Aware Dependency Retrieval
 
@@ -141,7 +113,7 @@ spec:
             * Resources ↔ ResourceQuota
             * Replicas ↔ PDB
 
-          For each dependency, , fetch only:
+          For each dependency, fetch only:
 
           ```
           kubectl get <kind> <name> [ -n <namespace>] -o json
@@ -152,8 +124,6 @@ spec:
           ```
           affected_resource → [linked live dependencies]
           ```
-
-          ---
 
           ### 4️⃣ Semantic Validation (Dependency-Scoped)
 
