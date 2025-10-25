@@ -52,7 +52,7 @@ kagent-tools:
         memory: 1Gi
 agents:
   k8s-agent:
-    enabled: true
+    enabled: false
   kgateway-agent:
     enabled: false
   istio-agent:
@@ -64,7 +64,7 @@ agents:
   argo-rollouts-agent:
     enabled: false
   helm-agent:
-    enabled: true
+    enabled: false
   cilium-policy-agent:
     enabled: false
   cilium-manager-agent:
@@ -89,3 +89,5 @@ tools:
   querydoc:
     enabled: true
     
+kmcp:
+  enabled: true

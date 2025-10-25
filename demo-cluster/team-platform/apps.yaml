@@ -17,24 +17,6 @@
     - kagent.yaml
   version: "0.6.21"
   autoSync:
-    enabled: false
-- name: kmcp-crd
-  owner: platform
-  project: platform
-  namespace: kmcp-system
-  repo: ghcr.io/kagent-dev/kmcp/helm
-  chart: kmcp-crds
-  version: "0.1.9"
-  autoSync:
-    enabled: true
-- name: kmcp
-  owner: platform
-  project: platform
-  namespace: kmcp-system
-  repo: ghcr.io/kagent-dev/kmcp/helm
-  chart: kmcp
-  version: "0.1.9"
-  autoSync:
     enabled: true
 - name: jaeger
   owner: platform

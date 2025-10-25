@@ -43,7 +43,6 @@ spec:
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
-    - ghcr.io/kagent-dev/kmcp/helm
     - https://jaegertracing.github.io/helm-charts
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
