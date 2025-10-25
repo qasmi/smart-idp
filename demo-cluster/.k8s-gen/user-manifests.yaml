@@ -47,16 +47,25 @@ spec:
   - chart: dao-2048
     helm:
       values: |
-        replicaCount: 1
+        replicaCount: 3
 
         resources: 
           limits:
-            cpu: 500m
+            cpu: 1500m
             memory: 128Mi
           requests:
             cpu: 100m
             memory: 128Mi
 
+        nodeSelector:
+          role: storage
+        
+        tolerations:
+          - key: role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
         service:
           type: LoadBalancer
 
