@@ -57,6 +57,15 @@ spec:
         nodeSelector:
           role: storage
         
+        nodeSelector:
+          role: storage
+        
+        tolerations:
+          - key: role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
         service:
           type: LoadBalancer
 
