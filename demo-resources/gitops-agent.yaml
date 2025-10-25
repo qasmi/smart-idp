@@ -155,12 +155,10 @@ spec:
 
       * **Resource Quota Enforcement:**
         
-        * Validate resource requests/limits against:
-          * Live `ResourceQuota` (if namespace exists), or
-          * Desired `ResourceQuota` (if defined).
+        * Compare requeste/limit CPU/memory against live or desired resourceQuota.
         * ResourceQuota Violations: 
           * Retrieve ResourceQuota's fields and validate each quota aginst the input resource, e.g.:
-            * Compute total requested resources = replicaCountx (cpu + memory requests/limits)
+            * Compute total requested resources = replicaCount x (cpu + memory requests/limits)
             * Compare against the corresponding quota limits in .status.hard.
         * Report precise limit violations.
         * Skip this step if no resourceQuota exist in the cluster or desired manifest.
