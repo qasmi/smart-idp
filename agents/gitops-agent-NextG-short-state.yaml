@@ -111,8 +111,8 @@ spec:
           * Compare desired vs live cluster to find **affected resources**:
 
             ```
-            CREATE → exists in desired, missing in live
-            UPDATE → exists in both but differs
+            CREATE → exists in desired, missing in live (no resource in the list of the live cluster resources)
+            UPDATE → exists in both but differs (get resource yaml detail detect changes)
             ```
           * Limit further validation to these affected resources.
           * For each, record `{group, kind, namespace, name}`.
@@ -141,7 +141,7 @@ spec:
             * Resources ↔ ResourceQuota
             * Replicas ↔ PDB
 
-          For each dependency, fetch only:
+          For each dependency, , fetch only:
 
           ```
           kubectl get <kind> <name> [ -n <namespace>] -o json
