@@ -71,41 +71,14 @@ spec:
 
           ### 1️⃣ Input & Context Extraction
 
-          a. Desired State Extraction:
+            * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
+            * For each Application:
 
-            * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
-            * **Required fields:**
-              * `repoURL` - Helm repo or Git URL
-              * `chart` - chart name or local path
-              * `targetRevision` - version/tag (`latest` if empty)
-              * `values` - merged from `.helm.values` and `.helm.parameters`
-              * `namespace` - from `.spec.destination.namespace` (default: `default`)
-            * **Normalization rules:**
-              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
-              * Merge Helm values and parameters into a single `--values`/`--set` structure.
-              
-          b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):
-
-            * CRITICAL: For each set of extracted parameters, **IMMEDIATELY** use the installed Helm tools to simulate the chart installation process using:
-              
-              ```
-              helm upgrade <release> <repo/chart> -n <namespace> \
-              --version <targetRevision> \
-              [--values ... or --set ...] \
-              --install --dry-run --timeout 30s --output yaml
-              ```
-
-            * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
-            * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
-
-            * If Helm rendering fails:
-
-              * Retry once.
-              * If still failing, record the `stderr` excerpt and mark the chart as `RENDER_FAILED`, but **continue** with other apps.
-              * Include the Helm error in the final Drift Summary under the failed Application.
-
-          * Combine rendered Helm manifests + static YAML → **full desired state**.
-
+              * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
+              * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
+              * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
+            * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+            * Combine rendered Helm resources with the input manifest → full desired state.
 
           ### 2️⃣ Diff & Target Set Discovery
 
@@ -113,12 +86,10 @@ spec:
 
             ```
             CREATE → exists in desired, missing in live
-            UPDATE → exists in both but differs
+            UPDATE → exists in both but differs 
             ```
           * Limit further validation to these affected resources.
           * For each, record `{group, kind, namespace, name}`.
-
-          ---
 
           ### 3️⃣ Context-Aware Dependency Retrieval
 
@@ -140,11 +111,12 @@ spec:
             * NodeSelector ↔ Node labels
             * tolerations ↔ Node taints
             * Resources ↔ ResourceQuota
+            * Replicas ↔ PDB
 
-          For each dependency, fetch only:
+          For each dependency, , fetch only:
 
           ```
-          kubectl get <kind> <name> [ Optional -n <namespace>] -o json
+          kubectl get <kind> <name> [ -n <namespace>] -o json
           ```
 
           Build a **minimal dependency subgraph** per resource:
@@ -153,8 +125,6 @@ spec:
           affected_resource → [linked live dependencies]
           ```
 
-          ---
-
           ### 4️⃣ Semantic Validation (Dependency-Scoped)
 
           Perform deterministic validation using this localized graph:
@@ -162,7 +132,7 @@ spec:
           * **Namespace & ResourceQuota:**
 
             * Validate only if namespace is new or changed.
-            * Compare requested CPU/memory against live or desired resourceQuota.
+            * Compare requeste/limit CPU/memory x replicas, against live or desired resourceQuota.
 
           * **API & CRD Schema:**
 
@@ -170,7 +140,8 @@ spec:
 
           * **Scheduling:**
 
-            * Check nodeSelector/tolerations vs live nodes labels/taints only.
+            * Check nodeSelector vs live nodes labels configuration
+            * Check tolerations vs live nodes taints configuration.
 
           * **Networking:**
 
@@ -277,17 +248,13 @@ spec:
         kind: RemoteMCPServer
         apiGroup: kagent.dev
         toolNames:
-        - k8s_check_service_connectivity
         - k8s_get_events
         - k8s_get_available_api_resources
         - k8s_get_cluster_configuration
         - k8s_describe_resource
         - k8s_get_resource_yaml
-        - k8s_execute_command
         - k8s_get_resources
-        - k8s_get_pod_logs
         - helm_repo_add
-        - helm_install
         - helm_list
         - helm_get
         - helm_upgrade
