@@ -65,7 +65,6 @@ spec:
       
         service:
           type: LoadBalancer
-          loadBalancerIP: "172.18.250.0"
 
     repoURL: http://daocloud.github.io/dao-2048/
     targetRevision: "1.2.1"
