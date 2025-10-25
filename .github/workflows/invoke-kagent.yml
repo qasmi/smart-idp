@@ -44,4 +44,4 @@ jobs:
           FILE_PATH="./demo-cluster/.k8s-gen/user-manifests.yaml"
           
           sed -i "1i PR ID: ${PR_ID}. Input manifest start here:" "${FILE_PATH}"
-          kagent --api-url "https://demo-smart-idp.uk/api" invoke --agent gitops-agent --file  ${FILE_PATH} | jq -r '.'
+          kagent --api-url "https://demo-smart-idp.uk/api" invoke --agent gitops-agent-ng --file  ${FILE_PATH} | jq -r '.'
