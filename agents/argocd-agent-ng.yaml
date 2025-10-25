@@ -45,7 +45,8 @@ spec:
             * For each `argoproj.io/v1alpha1, kind=Application`, extract and normalize Helm parameters from `.spec.source`.
             * **Required fields:**
               * `repoURL` - Helm repo or Git URL
-              * `chart` - chart name or local path
+              * `chart` - chart name
+              * `repo` chart name
               * `targetRevision` - version/tag (`latest` if empty)
               * `values` - merged from `.helm.values` and `.helm.parameters`
               * `namespace` - from `.spec.destination.namespace` (default: `default`)
