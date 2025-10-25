@@ -80,9 +80,7 @@ spec:
               * `targetRevision` - version/tag (`latest` if empty)
               * `values` - merged from `.helm.values` and `.helm.parameters`
               * `namespace` - from `.spec.destination.namespace` (default: `default`)
-              * `repo` chart name
             * **Normalization rules:**
-              * Validate chart reference: must be `repo/chart`. If invalid, mark as `FAILED_EXTRACTION`.
               * Merge Helm values and parameters into a single `--values`/`--set` structure.
               
           b. Manifest Generation (Main task, IMMEDIATE & MANDATORY):

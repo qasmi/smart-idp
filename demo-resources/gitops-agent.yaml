@@ -309,7 +309,6 @@ spec:
         - k8s_get_resources
         - k8s_get_pod_logs
         - helm_repo_add
-        - helm_install
         - helm_list
         - helm_get
         - helm_upgrade
