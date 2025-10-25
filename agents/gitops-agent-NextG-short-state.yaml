@@ -140,11 +140,12 @@ spec:
             * NodeSelector ↔ Node labels
             * tolerations ↔ Node taints
             * Resources ↔ ResourceQuota
+            * Replicas ↔ PDB
 
           For each dependency, fetch only:
 
           ```
-          kubectl get <kind> <name> [ Optional -n <namespace>] -o json
+          kubectl get <kind> <name> [ -n <namespace>] -o json
           ```
 
           Build a **minimal dependency subgraph** per resource:
@@ -284,7 +285,6 @@ spec:
         - k8s_get_cluster_configuration
         - k8s_describe_resource
         - k8s_get_resource_yaml
-        - k8s_execute_command
         - k8s_get_resources
         - k8s_get_pod_logs
         - helm_repo_add
