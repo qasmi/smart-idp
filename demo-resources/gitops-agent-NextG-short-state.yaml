@@ -94,7 +94,7 @@ spec:
               [--values ... or --set ...] \
               --install --dry-run --timeout 30s --output yaml
               ```
-              
+
             * The multiline Helm values YAML must be converted into the appropriate `--set` or `--values` format required for the Helm CLI execution.
             * This step must generate the full, final, rendered Kubernetes YAML manifest for that specific application (the **Desired State**).
 
@@ -222,12 +222,7 @@ spec:
 
             #### 3️⃣ Risk Analysis
 
-            Only confirmed problems:
-
-            ```
-            Problem → Impact → Mitigation
-            ```
-
+            Only confirmed problems, if any Found in Runtime Impact Prediction.
             Do not mention absences of risk or successful checks.
 
           ### 7️⃣ PR Comment Submission

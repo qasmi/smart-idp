@@ -89,3 +89,5 @@ tools:
   querydoc:
     enabled: true
     
+kmcp:
+  enabled: true
