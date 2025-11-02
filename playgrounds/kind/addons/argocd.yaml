@@ -3,6 +3,8 @@ global:
     format: json
 
 configs:
+  secret:
+    argocdServerAdminPassword: $2a$10$QeCKgnhmMIAYD/SRZnnpc.iDSVT0fJ8o5C7p49Ko6nbv/Er6hyukG
   rbac:
     create: true
     scopes: '[email,groups]'
