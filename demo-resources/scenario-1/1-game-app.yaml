@@ -66,6 +66,9 @@ spec:
         service:
           type: LoadBalancer
 
+        imagePullSecrets: 
+          - game-2048-pull-secret
+
     repoURL: http://daocloud.github.io/dao-2048/
     targetRevision: "1.2.1"
   syncPolicy:
