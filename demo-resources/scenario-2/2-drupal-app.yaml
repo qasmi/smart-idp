@@ -58,9 +58,8 @@ spec:
             cpu: 2000m
             memory: 2000M
 
-        service:
-          type: LoadBalancer
-          loadBalancerIP: "172.18.250.2"
+        mariadb:
+          enabled: false
           
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: 21.0.*

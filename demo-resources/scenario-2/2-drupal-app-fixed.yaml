@@ -41,6 +41,9 @@ spec:
   - chart: drupal
     helm:
       values: |
+        image:
+          repository: bitnamilegacy/drupal
+          
         drupalUsername: admin
 
         externalDatabase:
@@ -57,6 +60,9 @@ spec:
           requests:
             cpu: 500m
             memory: 2000M
+
+        mariadb:
+          enabled: false
 
     repoURL: https://charts.bitnami.com/bitnami
     targetRevision: 21.0.*
@@ -83,6 +89,9 @@ spec:
     targetRevision: "19.1.*"
     helm:
       values: |
+        image:
+          repository: bitnamilegacy/drupal
+          
         
   destination:
     server: https://kubernetes.default.svc
