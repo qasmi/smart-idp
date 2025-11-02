@@ -2,23 +2,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: kubecon-na
+  name: user
   namespace: argocd
 spec:
-  description: Demo project
+  description: User project
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: game-2048
   sourceRepos:
-    - https://charts.bitnami.com/bitnami
+    - http://daocloud.github.io/dao-2048/
 ---
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: kubecon-na
+  name: game-2048
 ---
 apiVersion: v1
 kind: ResourceQuota
 metadata:
   name: compute-quota
-  namespace: kubecon-na
+  namespace: game-2048
 spec:
   hard:
     requests.cpu: "1"  
@@ -29,43 +32,42 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: drupal-app
+  name: game-2048
   namespace: argocd
 spec:
   destination:
-    namespace: kubecon-na
+    namespace: game-2048
     server: https://kubernetes.default.svc
-  project: kubecon-na
+  project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: drupal
+  - chart: dao-2048
     helm:
       values: |
-        image:
-          repository: bitnamilegacy/drupal
-          
-        drupalUsername: admin
+        replicaCount: 3
 
-        externalDatabase:
-          host: drupal-app-db-mariadb.drupal-app.svc.cluster.local
-          port: 3306
-          database: bitnami_drupal
-          user: drupal
-          existingSecret: "drupal-app-externaldb"
-
-        resources:
+        resources: 
           limits:
-            cpu: 2000m
-            memory: 2000M
+            cpu: 1500m
+            memory: 128Mi
           requests:
-            cpu: 2000m
-            memory: 2000M
+            cpu: 100m
+            memory: 128Mi
 
-        mariadb:
-          enabled: false
+        nodeSelector:
+          role: storage
+        
+        tolerations:
+          - key: role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
+        service:
+          type: LoadBalancer
 
-    repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 21.0.*
+    repoURL: http://daocloud.github.io/dao-2048/
+    targetRevision: "1.2.1"
   syncPolicy:
     automated:
       prune: true
