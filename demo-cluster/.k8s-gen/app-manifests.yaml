@@ -28,7 +28,6 @@ spec:
     requests.memory: "1Gi" 
     limits.cpu: "1"  
     limits.memory: "1Gi" 
-    pods: "2"   
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -45,25 +44,19 @@ spec:
   - chart: dao-2048
     helm:
       values: |
-        replicaCount: 3
+        replicaCount: 1
 
         resources: 
           limits:
-            cpu: 1500m
+            cpu: 500m
             memory: 128Mi
           requests:
             cpu: 100m
             memory: 128Mi
 
         nodeSelector:
-          role: storage
+          kubernetes.io/hostname: kind-worker
         
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
-      
         service:
           type: LoadBalancer
 
