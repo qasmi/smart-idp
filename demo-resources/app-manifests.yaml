@@ -1,0 +1,76 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: user
+  namespace: argocd
+spec:
+  description: User project
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: game-2048
+  sourceRepos:
+    - http://daocloud.github.io/dao-2048/
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: game-2048
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: game-2048
+spec:
+  hard:
+    requests.cpu: "1"  
+    requests.memory: "1Gi" 
+    limits.cpu: "1"  
+    limits.memory: "1Gi" 
+    pods: "2"   
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: game-2048
+  namespace: argocd
+spec:
+  destination:
+    namespace: game-2048
+    server: https://kubernetes.default.svc
+  project: user
+  revisionHistoryLimit: 3
+  sources:
+  - chart: dao-2048
+    helm:
+      values: |
+        replicaCount: 3
+
+        resources: 
+          limits:
+            cpu: 1500m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+
+        nodeSelector:
+          role: storage
+        
+        tolerations:
+          - key: role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
+        service:
+          type: LoadBalancer
+
+    repoURL: http://daocloud.github.io/dao-2048/
+    targetRevision: "1.2.1"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
