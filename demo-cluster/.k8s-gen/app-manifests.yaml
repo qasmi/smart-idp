@@ -10,7 +10,7 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: music
   sourceRepos:
-    - https://github.com/linsun/chat-app/
+    - https://linsun.github.io/chat-app-charts
 ---
 apiVersion: v1
 kind: Namespace
