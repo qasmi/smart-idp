@@ -33,7 +33,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: chat-app
-  namespace: music
+  namespace: argocd
 spec:
   destination:
     namespace: music
