@@ -55,7 +55,7 @@ spec:
         service:
           type: LoadBalancer
     repoURL: https://linsun.github.io/chat-app-charts/
-    targetRevision: "0.2.0"
+    targetRevision: "0.1.0"
   syncPolicy:
     automated:
       prune: true

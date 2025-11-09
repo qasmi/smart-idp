@@ -44,11 +44,10 @@ spec:
   - chart: chat-app
     helm:
       values: |
-        replicaCount: 3
-
+        replicaCount: 1
         resources: 
           limits:
-            cpu: 1500m
+            cpu: 2000m
             memory: 128Mi
           requests:
             cpu: 100m
@@ -68,7 +67,7 @@ spec:
 
         imagePullSecrets: 
           - game-2048-pull-secret
-          
+
     repoURL: https://linsun.github.io/chat-app-charts/
     targetRevision: "0.2.0"
   syncPolicy:
