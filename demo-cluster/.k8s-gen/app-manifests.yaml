@@ -47,24 +47,14 @@ spec:
         replicaCount: 1
         resources:
           limits:
-            cpu: 2500m
+            cpu: 500m
             memory: 1Gi
           requests:
             cpu: 250m
             memory: 512Mi
-        nodeSelector:
-          role: storage
-
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
 
         service:
           type: LoadBalancer
-        imagePullSecrets: 
-          - game-2048-pull-secret
     repoURL: https://linsun.github.io/chat-app-charts/
     targetRevision: "0.1.0"
   syncPolicy:
