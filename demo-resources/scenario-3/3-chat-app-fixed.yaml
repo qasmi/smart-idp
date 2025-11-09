@@ -27,7 +27,7 @@ spec:
     requests.cpu: "1"  
     requests.memory: "1Gi" 
     limits.cpu: "1"  
-    limits.memory: "1280Mi"
+    limits.memory: "2Gi"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -45,9 +45,13 @@ spec:
     helm:
       values: |
         replicaCount: 1
+
+        image:
+          tag: "v5"
+
         resources:
           limits:
-            cpu: 250m
+            cpu: 500m
             memory: 1Gi
           requests:
             cpu: 250m
