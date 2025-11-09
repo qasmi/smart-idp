@@ -44,11 +44,11 @@ spec:
   - chart: chat-app
     helm:
       values: |
-        replicaCount: 3
+        replicaCount: 1
 
         resources: 
           limits:
-            cpu: 1500m
+            cpu: 200m
             memory: 128Mi
           requests:
             cpu: 100m
