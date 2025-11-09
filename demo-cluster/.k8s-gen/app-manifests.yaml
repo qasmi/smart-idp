@@ -1,1 +1,68 @@
 ---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: user
+  namespace: argocd
+spec:
+  description: User project
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: music
+  sourceRepos:
+    - https://linsun.github.io/chat-app-charts/
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: music
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: compute-quota
+  namespace: music
+spec:
+  hard:
+    requests.cpu: "1"  
+    requests.memory: "1Gi" 
+    limits.cpu: "1"  
+    limits.memory: "2Gi"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chat-app
+  namespace: argocd
+spec:
+  destination:
+    namespace: music
+    server: https://kubernetes.default.svc
+  project: user
+  revisionHistoryLimit: 3
+  sources:
+  - chart: chat-app
+    helm:
+      values: |
+        replicaCount: 1
+
+        image:
+          tag: "v5"
+
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 512Mi
+
+        service:
+          type: LoadBalancer
+          
+    repoURL: https://linsun.github.io/chat-app-charts/
+    targetRevision: "0.1.0"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
