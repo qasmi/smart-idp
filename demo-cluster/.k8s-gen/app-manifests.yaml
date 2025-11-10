@@ -59,9 +59,6 @@ spec:
 
         service:
           type: LoadBalancer
-
-        imagePullSecrets: 
-          - game-2048-pull-secret
           
     repoURL: https://linsun.github.io/chat-app-charts/
     targetRevision: "0.1.0"
