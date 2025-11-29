@@ -11,7 +11,8 @@ spec:
     args:
       - --http-addr
       - :8000
-    cmd: "/server/github-mcp-server"
     image: ghcr.io/nirmata/kyverno-mcp:v0.2.2
     port: 8000
-  transportType: stdio
+  transportType: http
+  httpTransport:
+    targetPort: 8000

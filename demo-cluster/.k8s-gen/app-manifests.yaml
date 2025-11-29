@@ -22,7 +22,7 @@ metadata:
   namespace: argocd
 spec:
   destination:
-    namespace: demo
+    namespace: demo-oss-japan
     server: https://kubernetes.default.svc
   project: user
   revisionHistoryLimit: 3
