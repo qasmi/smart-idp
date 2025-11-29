@@ -1,0 +1,16 @@
+---
+apiVersion: kagent.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: kyverno-mcp-server
+  namespace: kagent
+  labels:
+    kagent.dev/discovery: disabled
+spec:
+  deployment:
+    args:
+    - 'stdio'
+    cmd: "/server/github-mcp-server"
+    image: ghcr.io/nirmata/kyverno-mcp:v0.2.2
+    port: 65532
+  transportType: stdio
