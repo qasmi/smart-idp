@@ -16,6 +16,42 @@ spec:
     limits.memory: "2Gi"
 ---
 apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: game-2048
+  namespace: argocd
+spec:
+  destination:
+    namespace: demo
+    server: https://kubernetes.default.svc
+  project: user
+  revisionHistoryLimit: 3
+  sources:
+  - chart: dao-2048
+    helm:
+      values: |
+        nodeSelector:
+          role: storage
+        tolerations:
+          - key: role
+            value: storage
+            operator: Equal
+            effect: NoSchedule
+      
+        service:
+          type: LoadBalancer
+
+        imagePullSecrets: 
+          - game-2048-pull-secret
+
+    repoURL: http://daocloud.github.io/dao-2048/
+    targetRevision: "1.2.1"
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
   name: demo-oss-japan
@@ -25,6 +61,5 @@ spec:
   destinations:
     - server: https://kubernetes.default.svc
       namespace: demo-oss-japan
-  #sourceRepos:
-  #  - http://daocloud.github.io/dao-2048/
----
+  sourceRepos:
+    - http://daocloud.github.io/dao-2048/
