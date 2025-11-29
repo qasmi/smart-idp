@@ -9,8 +9,10 @@ metadata:
 spec:
   deployment:
     args:
-    - 'stdio'
-    cmd: "/server/github-mcp-server"
-    image: ghcr.io/nirmata/kyverno-mcp:v0.2.2
-    port: 65532
-  transportType: stdio
+      - --http-addr
+      - :8000
+    image: ghcr.io/lucchmielowski/kyverno-mcp:v0.6.0
+    port: 8000
+  transportType: http
+  httpTransport:
+    targetPort: 8000

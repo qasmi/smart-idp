@@ -101,9 +101,8 @@ spec:
 
         For each resource of the full desired state (produced in step 1):
         * **MANDATORY RESOURCE STATUS DETERMINATION:**
-          1. **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
-          2. **If Desired resource does not exist in the live cluster:** The Action is **CREATE**.
-  
+          1.  **If Desired resource does not exist in the live cluster (kubectl fails):** The Action is **CREATE**.
+          2.  **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
         * Output summary table:
 
           ```
@@ -273,19 +272,13 @@ spec:
         kind: RemoteMCPServer
         apiGroup: kagent.dev
         toolNames:
-        - k8s_check_service_connectivity
-        - k8s_get_events
-        - k8s_get_available_api_resources
         - k8s_get_cluster_configuration
         - k8s_describe_resource
         - k8s_get_resource_yaml
         - k8s_execute_command
         - k8s_get_resources
-        - k8s_get_pod_logs
         - helm_repo_add
         - helm_install
-        - helm_list
-        - helm_get
         - helm_upgrade
         - helm_repo_update
     - type: McpServer
