@@ -100,15 +100,50 @@ spec:
       2. Drift Comparison
 
         For each resource of the full desired state (produced in step 1):
-        * **MANDATORY RESOURCE STATUS DETERMINATION:**
-          1. **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
-          2. **If Desired resource does not exist in the live cluster:** The Action is **CREATE**.
-  
-        * Output summary table:
+
+        * Treat the resource as uniquely identified by:
+          * apiGroup + apiVersion
+          * kind
+          * namespace (empty for cluster-scoped resources)
+          * metadata.name
+
+        * To determine whether the resource already exists in the live cluster:
+
+          1. Use the `k8s_get_resources` tool with a query that targets the
+             **exact** resource:
+             - apiVersion / kind
+             - namespace (if namespaced)
+             - a name filter (fieldSelector or equivalent) for `metadata.name`.
+
+          2. Interpret the result as follows:
+             - If the tool returns **at least one matching resource** with the same
+               kind/namespace/name:
+                 → The resource **exists** in the live cluster.
+             - If the tool returns **no matching resource**:
+                 → The resource **does not exist** in the live cluster.
+
+          3. Based on existence and spec differences:
+
+             - If the resource **does not exist** in the live cluster:
+                 → Action = **CREATE**
+
+             - If the resource **exists** in the live cluster:
+                 - Compare the desired spec with the live spec:
+                     * If any relevant fields differ (including labels, annotations,
+                       spec fields, replicas, etc.):
+                         → Action = **UPDATE**
+                     * If all relevant fields are identical:
+                         → Action = **NO CHANGE**
+
+        * For the Drift Summary table, only include resources with Action = CREATE or UPDATE:
 
           ```
           | Kind | Namespace | Name | Action |
           ```
+
+        * Never assume a resource is CREATE purely because a generic list call did not
+          show it. Always perform a **direct existence check** for that specific
+          kind/namespace/name.
 
       3.  **Semantic Validation & Impact Prediction:**
 
