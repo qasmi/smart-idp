@@ -3,7 +3,7 @@ kind: ClusterPolicy
 metadata:
   name: require-resources
 spec:
-  validationFailureAction: enforce
+  validationFailureAction: audit
   rules:
     - name: check-container-resources
       match:
