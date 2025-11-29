@@ -39,3 +39,5 @@
   valueFiles: []
   autoSync:
     enabled: true
+    syncOptions:
+      - ServerSideApply=true
