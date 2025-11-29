@@ -23,6 +23,12 @@ kind: Namespace
 metadata:
   name: kmcp-system
 ---
+# Source: gitops-chart/templates/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kyverno
+---
 # Source: gitops-chart/templates/project.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
@@ -40,10 +46,13 @@ spec:
       namespace: kagent
     - server: https://kubernetes.default.svc
       namespace: kmcp-system
+    - server: https://kubernetes.default.svc
+      namespace: kyverno
   sourceRepos:
     - https://github.com/qasmi/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
     - https://jaegertracing.github.io/helm-charts
+    - https://kyverno.github.io/kyverno
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
       kind: ClusterRoleBinding

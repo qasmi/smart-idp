@@ -29,3 +29,13 @@
     - jaeger.yaml
   autoSync:
     enabled: true
+- name: kyverno
+  owner: platform
+  project: platform
+  namespace: kyverno
+  repo: https://kyverno.github.io/kyverno
+  chart: kyverno
+  version: "*"
+  valueFiles: []
+  autoSync:
+    enabled: true

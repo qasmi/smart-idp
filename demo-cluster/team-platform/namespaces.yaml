@@ -11,3 +11,7 @@ namespaces:
   jaeger:
     owner: platform
     project: platform
+  kyverno: 
+    owner: platform
+    project: platform
+    
