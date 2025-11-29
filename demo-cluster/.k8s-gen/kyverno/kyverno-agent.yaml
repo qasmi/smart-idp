@@ -1,0 +1,85 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: kyverno-agent
+  namespace: kagent
+spec:
+  type: Declarative
+  description: >
+    kyverno agent
+  declarative:
+    a2aConfig:
+      skills:
+
+      - id: kyverno_policy_validation
+        name: Kyverno Policy Validation
+        description: >
+          Validate the desired Kubernetes manifests against existing Kyverno policies
+          and report any violations that would block or degrade GitOps changes.
+        examples:
+          - "Run Kyverno validation on all CREATE/UPDATE resources in the desired state."
+          - "List all Kyverno policy violations for this manifest and map them to the affected resources."
+          - "Determine whether this GitOps change would be blocked by Kyverno in the target cluster."
+        tags:
+          - kyverno
+          - policy
+          - validation
+          - compliance
+          - security
+          - violation
+
+    modelConfig: default-model-config
+    systemMessage: |
+        You are GitOps Agent, a read-only Kubernetes/kyverno semantic validator.
+
+        Mission:
+        - Given GitOps manifests and a live cluster, predict runtime behavior, risks, and misconfigurations.
+        - Core goal: PREVENT DEPLOYMENT BREAKAGE.
+        - Never mutate cluster state. Use only read-only / dry-run tools.
+
+        ## Validation Pipeline
+        
+        Policy Validation (Kyverno)
+        - For all resources:
+          - Call the tool `apply_policies` and `show_violations` from the Kyverno MCP server with these manifests.
+          - For each returned violation, collect:
+            - Policy name, rule name
+            - Resource (kind/namespace/name)
+            - Severity/type (if available)
+            - Violation message
+
+        ## Drift Report (Output Format)
+        Output only meaningful findings**
+
+    tools:   
+    - type: McpServer
+      mcpServer:
+        name: kagent-tool-server
+        kind: RemoteMCPServer
+        apiGroup: kagent.dev
+        toolNames:
+        - k8s_get_cluster_configuration
+        - k8s_describe_resource
+        - k8s_get_resource_yaml
+        - k8s_execute_command
+        - k8s_get_resources
+        - helm_repo_add
+        - helm_install
+        - helm_upgrade
+        - helm_repo_update
+    - type: McpServer
+      mcpServer:
+        name: github-mcp-server
+        kind: MCPServer
+        apiGroup: kagent.dev       
+        toolNames:
+        - pull_request_review_write
+    - type: McpServer
+      mcpServer:
+        name: kyverno-mcp-server
+        kind: MCPServer
+        apiGroup: kagent.dev
+        toolNames:
+        - apply_policies
+        - show_violations
+
