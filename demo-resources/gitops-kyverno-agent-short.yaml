@@ -128,15 +128,12 @@ spec:
         4. Policy Validation (Kyverno)
         - For all CREATE/UPDATE resources:
           - Collect their full rendered YAML.
-          - Use the Kyverno MCP tool to validate them against existing policies.
-          - Collect for each violation:
+          - Call the tool `apply_policies` and `show_violations` from the Kyverno MCP server with these manifests.
+          - For each returned violation, collect:
             - Policy name, rule name
             - Resource (kind/namespace/name)
             - Severity/type (if available)
             - Violation message
-        - Treat Kyverno violations as authoritative for policy enforcement:
-          - If a violation would cause admission rejection → classify as runtime-blocking and probable GitOps sync failure.
-        - Only report actual Kyverno output. Do not invent violations.
 
         5. Drift Report (Output Format)
         Output only meaningful findings, in this order:
