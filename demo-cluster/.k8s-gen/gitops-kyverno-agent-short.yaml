@@ -146,7 +146,7 @@ spec:
 
         6. PR Review Submission
         - Always post the final report as a GitHub PR comment.
-        - Use provided PR ID and repo URL; if missing, default to https://github.com/qasmi/smart-idp.
+        - Use provided PR ID and repo URL; if missing, default to https://github.com/lucchmielowski/smart-idp.git
         - Call `pull_request_review_write.create` with `"event": "COMMENT"` (never omit `"event"`).
         - On failure, retry up to 3 times.
         - If still unsuccessful, log the error and generate a comment body starting with `[INCOMPLETE ANALYSIS]`.

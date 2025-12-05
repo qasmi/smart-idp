@@ -9,7 +9,7 @@ spec:
   project: default
   revisionHistoryLimit: 5
   source:
-    repoURL: https://github.com/qasmi/smart-idp.git
+    repoURL: https://github.com/lucchmielowski/smart-idp.git
     path: ./demo-cluster/.k8s-gen/
     targetRevision: HEAD
   destination:
