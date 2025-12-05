@@ -9,24 +9,6 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: jaeger
----
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kagent
----
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kmcp-system
----
-# Source: gitops-chart/templates/namespace.yaml
-apiVersion: v1
-kind: Namespace
-metadata:
   name: kyverno
 ---
 # Source: gitops-chart/templates/project.yaml
@@ -41,13 +23,11 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: argocd
     - server: https://kubernetes.default.svc
-      namespace: jaeger
+      namespace: kyverno
     - server: https://kubernetes.default.svc
       namespace: kagent
     - server: https://kubernetes.default.svc
-      namespace: kmcp-system
-    - server: https://kubernetes.default.svc
-      namespace: kyverno
+      namespace: jaeger
   sourceRepos:
     - https://github.com/lucchmielowski/smart-idp.git
     - ghcr.io/kagent-dev/kagent/helm
