@@ -142,11 +142,10 @@ spec:
         **Omit this section entirely if no blocking issues are found.**
 
         **Analysis order (strict):**
-        1. Kubernetes configuration
-        2. Kyverno policy enforcement
+        1. Kubernetes configuration (Mandatory)
+        2. Kyverno policy enforcement (Mandatory)
 
         **Rules:**
-        - Do **not** include warnings, best practices, or theoretical risks.
         - Do **not** repeat the same issue across categories.
         - Base all findings on **explicit evidence from the input**.
         - If a risk cannot cause a runtime failure, exclude it.
@@ -252,8 +251,9 @@ spec:
 
         Execution ends **only** after:
 
-        1. PR comment successfully submitted, or
-        2. 3 retries fail with logged error details.
+        1. kyverno policy analysis.
+        2. PR comment successfully submitted, or
+        3. 3 retries fail with logged error details.
 
         * **Pending Review Handling:**
           - If `.create` returns an error indicating a pending review exists:
