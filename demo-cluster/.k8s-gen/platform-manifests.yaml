@@ -61,7 +61,7 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: demo
   sourceRepos:
-    - https://github.com/lucchmielowski/smart-idp.git
+    - http://daocloud.github.io/dao-2048/
   clusterResourceWhitelist: []
 ---
 # Source: gitops-chart/templates/applicationSet.yaml
