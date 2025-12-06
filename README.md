@@ -76,8 +76,6 @@ To allow local or CI invocation, forward the controller service port:
 ```bash
 kubectl port-forward svc/kagent-controller 8083:8083 -n kagent &
 kubectl port-forward svc/argocd-server 80:80 -n argocd &
-kubectl port-forward svc/kagent-ui 8081:8080 -n kagent &
-kubectl port-forward svc/jaeger-query -n jaeger 16686:16686 &
 ```
 
 ## 5\. Invoke GitOps Agent (using the CLI)

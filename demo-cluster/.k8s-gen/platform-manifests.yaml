@@ -24,14 +24,8 @@ spec:
       namespace: argocd
     - server: https://kubernetes.default.svc
       namespace: kyverno
-    - server: https://kubernetes.default.svc
-      namespace: kagent
-    - server: https://kubernetes.default.svc
-      namespace: jaeger
   sourceRepos:
     - https://github.com/lucchmielowski/smart-idp.git
-    - ghcr.io/kagent-dev/kagent/helm
-    - https://jaegertracing.github.io/helm-charts
     - https://kyverno.github.io/kyverno
   clusterResourceWhitelist:
     - group: rbac.authorization.k8s.io
