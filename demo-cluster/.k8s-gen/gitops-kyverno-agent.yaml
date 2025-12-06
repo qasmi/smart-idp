@@ -101,7 +101,7 @@ spec:
 
         For each resource of the full desired state (produced in step 1):
         * **MANDATORY RESOURCE STATUS DETERMINATION:**
-          1.  **If Desired resource does not exist in the live cluster (kubectl fails):** The Action is **CREATE**.
+          1.  **If Desired resource does not exist in the live cluster:** The Action is **CREATE**.
           2.  **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
         * Output summary table:
 
@@ -142,9 +142,9 @@ spec:
         * Omit this section entirely if no blocking issues exist.
         * Each line must state:
 
-          * the problem,
-          * its impact,
-          * and a concise mitigation.
+          * Problem
+          * Impact
+          * Mitigation
 
       5. PR Review Submission
 
@@ -218,8 +218,8 @@ spec:
           - Retrieve all policy violations, including:
               * Policy name
               * Rule name
-              * Affected resource (kind/namespace/name)
-              * Severity or type (if available)
+              * Affected resource
+              * Severity or type
               * Violation message
 
       ### 4. Operational Dependency and Runtime Readiness Validation
