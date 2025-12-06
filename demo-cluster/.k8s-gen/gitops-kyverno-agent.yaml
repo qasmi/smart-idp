@@ -131,48 +131,14 @@ spec:
 
         1. Input & Desired State Extraction
 
-        - Parse provided YAML.
-        - Extract ONLY:
-          apiVersion = argoproj.io/v1alpha1
-          kind = Application
+          * Parse the provided YAML and extract all resources, focusing on `argoproj.io/v1alpha1, kind=Application`.
+          * For each Application:
 
-        For each Application:
-
-        - Extract:
-          repoURL
-          chart
-          targetRevision
-          destination.namespace
-          helm.values
-          helm.parameters
-
-        - Normalize Helm values:
-          - Convert helm.parameters into values YAML.
-          - Merge into helm.values.
-          - If merge fails → mark FAILED_EXTRACTION.
-
-        - Construct Helm command STRICTLY as:
-
-          helm upgrade <release> <chart> \
-            --repo <repoURL> \
-            --version <targetRevision> \
-            --namespace <namespace> \
-            --install \
-            --dry-run \
-            --output yaml \
-            -f <merged-values.yaml>
-
-          Rules:
-          - If targetRevision is empty → OMIT --version.
-          - NEVER use repo/chart syntax.
-          - NEVER run non-dry-run.
-          - If command fails → mark FAILED_RENDER.
-
-        - Render desired manifests.
-        - Combine:
-          - Rendered Helm output
-          - All non-Application resources
-        → Full Desired State.
+            * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
+            * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
+            * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
+          * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+          * Combine rendered Helm resources with the input manifest → full desired state.
 
         --------------------------------------------------
 
