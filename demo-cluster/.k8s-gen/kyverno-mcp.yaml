@@ -11,7 +11,7 @@ spec:
     args:
       - --http-addr
       - :8000
-    image: ghcr.io/lucchmielowski/kyverno-mcp:v0.6.0
+    image: ghcr.io/lucchmielowski/kyverno-mcp:v0.6.2
     port: 8000
   transportType: http
   httpTransport:
