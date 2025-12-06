@@ -3,11 +3,20 @@ environment:
 
 teams: {}
 
-projects: {}
+projects:
+  user:
+    includeNamespaces:
+      - demo
+    sourceRepos:
+      - http://daocloud.github.io/dao-2048/
+    clusterResourceWhitelist: []
 
 applications: {}
 
-namespaces: {}
+namespaces:
+  demo:
+    annotations: {}
+    labels: {}
 
 certificateClusterIssuer: {}
 
