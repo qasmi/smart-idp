@@ -14,23 +14,38 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      #- name: Generate Manifests
-      #  run: |
-      #    git config user.name "github-actions[bot]"
-      #    git config user.email "github-actions[bot]@users.noreply.github.com"
-      #    git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-      #    git fetch origin ${{ github.head_ref }} 
-      #    git checkout -B ${{ github.head_ref }} origin/${{ github.head_ref }}
-      #    cd demo-cluster
-      #    make || exit 1
-      #    cd ..
-      #    git add ./demo-cluster/.k8s-gen/
-      #    if ! git diff --cached --quiet; then
-      #      git commit -m "chore: auto-update manifests [ci skip]"
-      #      git push origin ${{ github.head_ref }} -o ci.skip
-      #    else
-      #      echo "No changes to commit."
-      #    fi
+      - name: Validate YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: 'demo-cluster'
+          config_data: |
+            extends: default
+            rules:
+              line-length:
+                max: 200
+                level: warning
+              comments:
+                min-spaces-from-content: 1
+          strict: false
+
+      - name: Install kubeconform
+        run: |
+          wget -q https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform-linux-amd64.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+
+      - name: Validate Kubernetes/ArgoCD schemas
+        run: |
+          echo "🔍 Validating Kubernetes/ArgoCD schemas..."
+          find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "*/.git/*" \
+            ! -path "*/.k8s-gen/*" \
+            -exec sh -c '
+              if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1"; then
+                echo "Validating: $1"
+                kubeconform -strict -summary "$1" || exit 1
+              fi
+            ' _ {} \;
 
       - name: Install KAgent
         run: |
