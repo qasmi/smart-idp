@@ -24,10 +24,10 @@ metadata:
   namespace: game-2048
 spec:
   hard:
-    requests.cpu: "1"  
-    requests.memory: "1Gi" 
-    limits.cpu: "1"  
-    limits.memory: "1Gi" 
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "1"
+    limits.memory: "1Gi"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -41,29 +41,28 @@ spec:
   project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: dao-2048
-    helm:
-      values: |
-        replicaCount: 1
+    - chart: dao-2048
+      helm:
+        values: |
+          replicaCount: 1
 
-        resources: 
-          limits:
-            cpu: 500m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
 
-        nodeSelector:
-          kubernetes.io/hostname: kind-worker
-        
-        service:
-          type: LoadBalancer
+          nodeSelector:
+            kubernetes.io/hostname: kind-worker
 
-    repoURL: http://daocloud.github.io/dao-2048/
-    targetRevision: "1.2.1"
+          service:
+            type: LoadBalancer
+
+      repoURL: http://daocloud.github.io/dao-2048/
+      targetRevision: "1.2.1"
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-

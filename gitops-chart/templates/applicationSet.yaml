@@ -26,9 +26,9 @@ spec:
       project: '{{`{{ .project }}`}}'
       revisionHistoryLimit: {{ $.Values.gitops.revisionHistoryLimit }}
       sources:
-      - repoURL: {{ $.Values.gitops.repository }}
-        targetRevision: {{ $.Values.gitops.revision | default "HEAD" }}
-        ref: valuesRef
+        - repoURL: {{ $.Values.gitops.repository }}
+          targetRevision: {{ $.Values.gitops.revision | default "HEAD" }}
+          ref: valuesRef
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{`{{ .namespace }}`}}'

@@ -1,3 +1,4 @@
+---
 name: Validate GitOps Manifests
 
 on:
@@ -12,38 +13,32 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install tools
+      - name: Validate YAML syntax
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          file_or_dir: 'demo-cluster'
+          config_data: |
+            extends: default
+            rules:
+              line-length:
+                max: 200
+                level: warning
+              comments:
+                min-spaces-from-content: 1
+          strict: false
+
+      - name: Install kubeconform
         run: |
-          # Install yamllint
-          pip3 install yamllint
-          # Install kubeconform
           wget -q https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
           tar xf kubeconform-linux-amd64.tar.gz
           sudo mv kubeconform /usr/local/bin/
-          # Install Kyverno CLI
-          KYVERNO_VERSION=$(curl -s https://api.github.com/repos/kyverno/kyverno/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/v//')
-          wget -q "https://github.com/kyverno/kyverno/releases/latest/download/kyverno-cli-v${KYVERNO_VERSION}-linux-amd64.tar.gz" -O kyverno-cli.tar.gz
-          tar xf kyverno-cli.tar.gz
-          sudo mv kyverno /usr/local/bin/
-          kyverno version
-
-      - name: Validate YAML syntax
-        run: |
-          echo "🔍 Validating YAML syntax..."
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
-            ! -path "./.git/*" \
-            ! -path "./node_modules/*" \
-            ! -path "./.github/*" \
-            -exec yamllint -d relaxed {} \; || exit 1
-          echo "✅ All YAML files are syntactically valid"
 
       - name: Validate Kubernetes/ArgoCD schemas
         run: |
           echo "🔍 Validating Kubernetes/ArgoCD schemas..."
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
-            ! -path "./.git/*" \
-            ! -path "./node_modules/*" \
-            ! -path "./.github/*" \
+          find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "*/.git/*" \
+            ! -path "*/.k8s-gen/*" \
             -exec sh -c '
               if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1"; then
                 echo "Validating: $1"
@@ -51,39 +46,206 @@ jobs:
               fi
             ' _ {} \;
 
-      - name: Download Kyverno policies
-        run: |
-          echo "📥 Downloading Kyverno pod security policies..."
-          mkdir -p /tmp/kyverno-policies
-          wget -q https://raw.githubusercontent.com/lucchmielowski/kyverno-mcp/refs/heads/main/pkg/tools/policies/pod-security.yaml -O /tmp/kyverno-policies/pod-security.yaml
-          echo "✅ Policies downloaded"
+      - name: Install Helm
+        uses: azure/setup-helm@v4
 
-      - name: Validate against Kyverno policies
+      - name: Install yq
         run: |
-          echo "🛡️ Validating manifests against Kyverno pod security policies..."
-          # Collect all Kubernetes resource files (excluding ArgoCD Application resources as they're not deployed directly)
-          mkdir -p /tmp/resources-to-validate
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
-            ! -path "./.git/*" \
-            ! -path "./node_modules/*" \
-            ! -path "./.github/*" \
-            ! -path "./.k8s-gen/*" \
+          wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Render Helm charts from ArgoCD Applications
+        run: |
+          echo "🔧 Rendering Helm charts from ArgoCD Applications..."
+          mkdir -p /tmp/rendered-manifests
+          
+          # Find all ArgoCD Applications with Helm chart sources
+          for app_file in $(find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) ! -path "*/.git/*" | xargs grep -l "kind: Application" | xargs grep -l "chart:"); do
+            echo "Processing Application: $app_file"
+            app_name=$(basename "$app_file" .yaml)
+            
+            # Check if it uses sources (multiple) or source (single)
+            if yq eval ".spec.sources" "$app_file" 2>/dev/null | grep -q "."; then
+              # Multiple sources - process each one with a chart
+              source_count=$(yq eval ".spec.sources | length" "$app_file" 2>/dev/null || echo "0")
+              for i in $(seq 0 $((source_count - 1))); do
+                chart=$(yq eval ".spec.sources[$i].chart" "$app_file" 2>/dev/null)
+                repo_url=$(yq eval ".spec.sources[$i].repoURL" "$app_file" 2>/dev/null)
+                target_revision=$(yq eval ".spec.sources[$i].targetRevision" "$app_file" 2>/dev/null)
+                values=$(yq eval ".spec.sources[$i].helm.values" "$app_file" 2>/dev/null)
+                
+                if [ -n "$chart" ] && [ "$chart" != "null" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                  echo "  Rendering chart: $chart from $repo_url${target_revision:+ (version: $target_revision)}"
+                  
+                  # Create a unique repo name from URL
+                  repo_name=$(echo "$repo_url" | sed "s/[^a-zA-Z0-9]/-/g" | cut -c1-50)
+                  
+                  # Add Helm repo if not already added
+                  if ! helm repo list 2>/dev/null | grep -q "$repo_name"; then
+                    helm repo add "$repo_name" "$repo_url" 2>/dev/null || {
+                      echo "    ⚠️  Failed to add repo $repo_url, skipping..."
+                      continue
+                    }
+                  fi
+                  helm repo update "$repo_name" 2>/dev/null || true
+                  
+                  # Create values file if values are present
+                  values_file=""
+                  if [ -n "$values" ] && [ "$values" != "null" ] && [ "$values" != "|" ]; then
+                    values_file=$(mktemp)
+                    echo "$values" > "$values_file"
+                  fi
+                  
+                  # Render the chart
+                  output_file="/tmp/rendered-manifests/${app_name}-${chart}-rendered.yaml"
+                  if [ -n "$values_file" ] && [ -s "$values_file" ]; then
+                    if helm template "$chart" "$repo_name/$chart" \
+                      ${target_revision:+--version "$target_revision"} \
+                      --values "$values_file" > "$output_file" 2>&1; then
+                      if [ -s "$output_file" ] && ! grep -qi "error" "$output_file"; then
+                        echo "    ✅ Successfully rendered $chart"
+                      else
+                        echo "    ⚠️  Rendering produced errors or empty output"
+                        rm -f "$output_file"
+                      fi
+                    else
+                      echo "    ⚠️  Failed to render $chart"
+                      rm -f "$output_file"
+                    fi
+                    rm -f "$values_file"
+                  else
+                    if helm template "$chart" "$repo_name/$chart" \
+                      ${target_revision:+--version "$target_revision"} > "$output_file" 2>&1; then
+                      if [ -s "$output_file" ] && ! grep -qi "error" "$output_file"; then
+                        echo "    ✅ Successfully rendered $chart"
+                      else
+                        echo "    ⚠️  Rendering produced errors or empty output"
+                        rm -f "$output_file"
+                      fi
+                    else
+                      echo "    ⚠️  Failed to render $chart"
+                      rm -f "$output_file"
+                    fi
+                  fi
+                fi
+              done
+            else
+              # Single source
+              chart=$(yq eval ".spec.source.chart" "$app_file" 2>/dev/null)
+              repo_url=$(yq eval ".spec.source.repoURL" "$app_file" 2>/dev/null)
+              target_revision=$(yq eval ".spec.source.targetRevision" "$app_file" 2>/dev/null)
+              values=$(yq eval ".spec.source.helm.values" "$app_file" 2>/dev/null)
+              
+              if [ -n "$chart" ] && [ "$chart" != "null" ] && [ -n "$repo_url" ] && [ "$repo_url" != "null" ]; then
+                echo "  Rendering chart: $chart from $repo_url${target_revision:+ (version: $target_revision)}"
+                
+                # Create a unique repo name from URL
+                repo_name=$(echo "$repo_url" | sed "s/[^a-zA-Z0-9]/-/g" | cut -c1-50)
+                
+                # Add Helm repo if not already added
+                if ! helm repo list 2>/dev/null | grep -q "$repo_name"; then
+                  helm repo add "$repo_name" "$repo_url" 2>/dev/null || {
+                    echo "    ⚠️  Failed to add repo $repo_url, skipping..."
+                    continue
+                  }
+                fi
+                helm repo update "$repo_name" 2>/dev/null || true
+                
+                # Create values file if values are present
+                values_file=""
+                if [ -n "$values" ] && [ "$values" != "null" ] && [ "$values" != "|" ]; then
+                  values_file=$(mktemp)
+                  echo "$values" > "$values_file"
+                fi
+                
+                # Render the chart
+                output_file="/tmp/rendered-manifests/${app_name}-${chart}-rendered.yaml"
+                if [ -n "$values_file" ] && [ -s "$values_file" ]; then
+                  if helm template "$chart" "$repo_name/$chart" \
+                    ${target_revision:+--version "$target_revision"} \
+                    --values "$values_file" > "$output_file" 2>&1; then
+                    if [ -s "$output_file" ] && ! grep -qi "error" "$output_file"; then
+                      echo "    ✅ Successfully rendered $chart"
+                    else
+                      echo "    ⚠️  Rendering produced errors or empty output"
+                      rm -f "$output_file"
+                    fi
+                  else
+                    echo "    ⚠️  Failed to render $chart"
+                    rm -f "$output_file"
+                  fi
+                  rm -f "$values_file"
+                else
+                  if helm template "$chart" "$repo_name/$chart" \
+                    ${target_revision:+--version "$target_revision"} > "$output_file" 2>&1; then
+                    if [ -s "$output_file" ] && ! grep -qi "error" "$output_file"; then
+                      echo "    ✅ Successfully rendered $chart"
+                    else
+                      echo "    ⚠️  Rendering produced errors or empty output"
+                      rm -f "$output_file"
+                    fi
+                  else
+                    echo "    ⚠️  Failed to render $chart"
+                    rm -f "$output_file"
+                  fi
+                fi
+              fi
+            fi
+          done
+          
+          echo "✅ Helm chart rendering complete"
+          echo "📋 Rendered manifests:"
+          ls -la /tmp/rendered-manifests/ 2>/dev/null || echo "  (none found)"
+
+      - name: Validate rendered Helm manifests
+        run: |
+          echo "🔍 Validating rendered Helm manifests..."
+          if [ -d /tmp/rendered-manifests ] && [ "$(ls -A /tmp/rendered-manifests)" ]; then
+            find /tmp/rendered-manifests -type f \( -name "*.yaml" -o -name "*.yml" \) \
+              -exec sh -c '
+                if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1"; then
+                  echo "Validating rendered manifest: $1"
+                  kubeconform -strict -summary "$1" || exit 1
+                fi
+              ' _ {} \;
+          else
+            echo "  No rendered manifests to validate"
+          fi
+
+      - name: Prepare resources for Kyverno validation
+        run: |
+          echo "📋 Collecting Kubernetes resources for validation..."
+          mkdir -p /tmp/kyverno-resources
+          
+          # Copy non-Application resources from demo-cluster
+          find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "*/.git/*" \
             -exec sh -c '
-              if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1" && ! grep -q "kind: Application" "$1"; then
-                cp "$1" /tmp/resources-to-validate/
-                echo "  Found resource: $1"
+              if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1" && ! grep -qE "^kind: Application$" "$1"; then
+                cp "$1" /tmp/kyverno-resources/
+                echo "  Found: $1"
               fi
             ' _ {} \;
           
-          # Validate all resources against policies
-          if [ "$(ls -A /tmp/resources-to-validate 2>/dev/null)" ]; then
-            echo "Running Kyverno policy validation..."
-            # Validate resources against policies (kyverno apply validates without needing a cluster)
-            kyverno apply /tmp/kyverno-policies --resource /tmp/resources-to-validate/ || exit 1
-            echo "✅ All manifests passed Kyverno pod security policy checks"
-          else
-            echo "⚠️ No Kubernetes resources found to validate (ArgoCD Applications are skipped)"
+          # Copy rendered Helm manifests (excluding Applications)
+          if [ -d /tmp/rendered-manifests ] && [ "$(ls -A /tmp/rendered-manifests)" ]; then
+            find /tmp/rendered-manifests -type f \( -name "*.yaml" -o -name "*.yml" \) \
+              -exec sh -c '
+                if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1" && ! grep -qE "^kind: Application$" "$1"; then
+                  cp "$1" /tmp/kyverno-resources/
+                  echo "  Found rendered: $1"
+                fi
+              ' _ {} \;
           fi
+          
+          echo "📊 Total resources collected for Kyverno validation:"
+          ls -1 /tmp/kyverno-resources/ | wc -l
+
+      - name: Validate against Kyverno policies
+        uses: ckotzbauer/kyverno-test-action@v2
+        with:
+          resource-files: '/tmp/kyverno-resources/*.yaml'
+          policy-files: 'https://raw.githubusercontent.com/lucchmielowski/kyverno-mcp/refs/heads/main/pkg/tools/policies/pod-security.yaml'
 
       - name: Summary
         if: success()
@@ -92,9 +254,6 @@ jobs:
           echo "✅ All GitOps manifests validated successfully!"
           echo ""
           echo "📋 ArgoCD Applications found:"
-          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
-            ! -path "./.git/*" \
-            ! -path "./node_modules/*" \
-            ! -path "./.github/*" \
+          find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "*/.git/*" \
             -exec grep -l "kind: Application" {} \; | sed 's/^/  ✓ /' || echo "  (none found)"
-

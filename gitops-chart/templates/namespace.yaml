@@ -5,11 +5,11 @@ kind: Namespace
 metadata:
   {{- if $namespace.annotations }}
   annotations:
-  {{- toYaml $namespace.annotations | nindent 4 }}
+    {{- toYaml $namespace.annotations | nindent 4 }}
   {{- end }}
   {{- if $namespace.labels }}
   labels:
-  {{- toYaml $namespace.labels | nindent 4 }}
+    {{- toYaml $namespace.labels | nindent 4 }}
   {{- end }}
   name: {{ $namespaceName }}
 {{- end }}

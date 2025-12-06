@@ -24,10 +24,10 @@ metadata:
   namespace: music
 spec:
   hard:
-    requests.cpu: "1"  
-    requests.memory: "1Gi" 
-    limits.cpu: "1"  
-    limits.memory: "1280Mi" 
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "1"
+    limits.memory: "1280Mi"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -41,35 +41,35 @@ spec:
   project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: chat-app
-    helm:
-      values: |
-        replicaCount: 1
-        resources: 
-          limits:
-            cpu: 2000m
-            memory: 128Mi
-          requests:
-            cpu: 100m
-            memory: 128Mi
+    - chart: chat-app
+      helm:
+        values: |
+          replicaCount: 1
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
 
-        nodeSelector:
-          role: storage
-        
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
-      
-        service:
-          type: LoadBalancer
+          nodeSelector:
+            role: storage
 
-        imagePullSecrets: 
-          - game-2048-pull-secret
+          tolerations:
+            - key: role
+              value: storage
+              operator: Equal
+              effect: NoSchedule
 
-    repoURL: https://linsun.github.io/chat-app-charts/
-    targetRevision: "0.2.0"
+          service:
+            type: LoadBalancer
+
+          imagePullSecrets:
+            - game-2048-pull-secret
+
+      repoURL: https://linsun.github.io/chat-app-charts/
+      targetRevision: "0.2.0"
   syncPolicy:
     automated:
       prune: true

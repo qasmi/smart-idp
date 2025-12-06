@@ -1,3 +1,4 @@
+---
 apiVersion: kagent.dev/v1alpha2
 kind: Agent
 metadata:
@@ -9,55 +10,55 @@ spec:
     A GitOps-Aware Kubernetes Expert Agent integrating ArgoCD, Kubernetes, and GitHub MCP servers
     to predict and validate the real impact of GitOps changes before merging them into production.
     You are an ArgoCD Expert specializing in rendering, analyzing, and dry-running ArgoCD Applications and ApplicationSets to produce the exact Kubernetes resources they would generate.
-  
+
   declarative:
     a2aConfig:
       skills:
-      - id: argocd_application_render
-        name: ArgoCD Application Rendering
-        description: Resolve and render the full list of Kubernetes resources (Helm or raw manifests) that an ArgoCD Application would generate.
-        examples:
-          - Render all the Kubernetes resources an ArgoCD Application would create.
-          - Identify the helm chart used by the argocd application. Identify the chart version and values from the application resource definition.
-          - Rendre the Helm chart using the identified version and values.
-          - Expand all underlying kubernetes resources.
-        tags: 
-          - application
-          - render
-          - helm
-          - kubernetes
-          - manifest
+        - id: argocd_application_render
+          name: ArgoCD Application Rendering
+          description: Resolve and render the full list of Kubernetes resources (Helm or raw manifests) that an ArgoCD Application would generate.
+          examples:
+            - Render all the Kubernetes resources an ArgoCD Application would create.
+            - Identify the helm chart used by the argocd application. Identify the chart version and values from the application resource definition.
+            - Rendre the Helm chart using the identified version and values.
+            - Expand all underlying kubernetes resources.
+          tags:
+            - application
+            - render
+            - helm
+            - kubernetes
+            - manifest
 
-      - id: argocd_diff
-        name: ArgoCD Diff
-        description: Compare the rendered resources against the live cluster state to identify additions, modifications, and deletions.
-        examples:
-          - What resources would change if this Application is synced?
-        tags: 
-          - diff
-          - argocd
-          - kubernetes
-          - sync
-          - troubleshooting
+        - id: argocd_diff
+          name: ArgoCD Diff
+          description: Compare the rendered resources against the live cluster state to identify additions, modifications, and deletions.
+          examples:
+            - What resources would change if this Application is synced?
+          tags:
+            - diff
+            - argocd
+            - kubernetes
+            - sync
+            - troubleshooting
 
-      - id: impact-analysis
-        name: Advanced Impact Analysis
-        description: Perform deep semantic checks to detect indirect dependencies, compliance issues, and risks.
-        examples:
-          - "Could applying this manifest disrupt workloads currently running in the cluster?"
-          - "Detect second-level dependencies and hidden risks from these changes."
-          - "Summarize cluster-wide impact of merging this PR."
-        tags: 
-          - analysis
-          - compliance
-          - risk
-          - security
+        - id: impact-analysis
+          name: Advanced Impact Analysis
+          description: Perform deep semantic checks to detect indirect dependencies, compliance issues, and risks.
+          examples:
+            - "Could applying this manifest disrupt workloads currently running in the cluster?"
+            - "Detect second-level dependencies and hidden risks from these changes."
+            - "Summarize cluster-wide impact of merging this PR."
+          tags:
+            - analysis
+            - compliance
+            - risk
+            - security
 
     modelConfig: default-model-config
     systemMessage: |
       You are GitOps Agent, a read-only Kubernetes/Argo CD semantic validator.
       Mission: prevent deployment breakage by detecting drift, incompatibilities, missing dependencies, and runtime risks between desired state (GitOps) and live cluster.
-      
+
       ### Core Mandate
 
       **PREVENT DEPLOYMENT BREAKAGE.**
@@ -95,7 +96,7 @@ spec:
               The live cluster state, and
               the desired manifest.
               Then, every validation check must base its conclusion on the combined dependency view.
-          
+
           * For each resource with CREATE or UPDATE action (step 2), run the **Semantic Validation Framework** to ensure:
               * All required dependencies **exist** in the live state or in the desired state manifest, otherwise report missing depencencies.
               * Inter-resource links are valid, otherwise report missing links.
@@ -154,11 +155,11 @@ spec:
         * Ensure the existing og the dependencies and compatibility.
 
       * **Resource Quota Enforcement:**
-        
+
         * Validate resource requests/limits against:
           * Live `ResourceQuota` (if namespace exists), or
           * Desired `ResourceQuota` (if defined).
-        * ResourceQuota Violations: 
+        * ResourceQuota Violations:
           * Retrieve ResourceQuota's fields and validate each quota aginst the input resource, e.g.:
             * Compute total requested resources = replicaCountx (cpu + memory requests/limits)
             * Compare against the corresponding quota limits in .status.hard.
@@ -292,32 +293,32 @@ spec:
         2. Produce **only actionable, evidence-based findings** that can break runtime.
         3. Operate safely, silently, deterministically — and always finish with a PR comment.
 
-    tools:   
-    - type: McpServer
-      mcpServer:
-        name: kagent-tool-server
-        kind: RemoteMCPServer
-        apiGroup: kagent.dev
-        toolNames:
-        - k8s_check_service_connectivity
-        - k8s_get_events
-        - k8s_get_available_api_resources
-        - k8s_get_cluster_configuration
-        - k8s_describe_resource
-        - k8s_get_resource_yaml
-        - k8s_execute_command
-        - k8s_get_resources
-        - k8s_get_pod_logs
-        - helm_repo_add
-        - helm_install
-        - helm_list
-        - helm_get
-        - helm_upgrade
-        - helm_repo_update
-    - type: McpServer
-      mcpServer:
-        name: github-mcp-server
-        kind: MCPServer
-        apiGroup: kagent.dev       
-        toolNames:
-        - pull_request_review_write
+    tools:
+      - type: McpServer
+        mcpServer:
+          name: kagent-tool-server
+          kind: RemoteMCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - k8s_check_service_connectivity
+            - k8s_get_events
+            - k8s_get_available_api_resources
+            - k8s_get_cluster_configuration
+            - k8s_describe_resource
+            - k8s_get_resource_yaml
+            - k8s_execute_command
+            - k8s_get_resources
+            - k8s_get_pod_logs
+            - helm_repo_add
+            - helm_install
+            - helm_list
+            - helm_get
+            - helm_upgrade
+            - helm_repo_update
+      - type: McpServer
+        mcpServer:
+          name: github-mcp-server
+          kind: MCPServer
+          apiGroup: kagent.dev
+          toolNames:
+            - pull_request_review_write

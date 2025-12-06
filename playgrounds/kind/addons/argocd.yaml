@@ -1,3 +1,4 @@
+---
 global:
   logging:
     format: json
@@ -13,7 +14,7 @@ configs:
 
 applicationSet:
   replicas: 1
-      
+
 controller:
   extraArgs:
     - --app-resync=20
@@ -23,7 +24,7 @@ controller:
 
 redis-ha:
   enabled: false
-  
+
 repoServer:
   logFormat: json
   logLevel: "warn"
@@ -35,7 +36,7 @@ server:
     type: LoadBalancer
     loadBalancerIP: "172.18.250.0"
   logFormat: json
-      
+
 dex:
   enabled: false
 

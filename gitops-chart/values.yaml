@@ -26,4 +26,3 @@ argocd:
 gitops:
   repository: ''
   revisionHistoryLimit: 3
-  

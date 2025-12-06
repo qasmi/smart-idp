@@ -24,9 +24,9 @@ metadata:
   namespace: music
 spec:
   hard:
-    requests.cpu: "1"  
-    requests.memory: "1Gi" 
-    limits.cpu: "1"  
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "1"
     limits.memory: "2Gi"
 ---
 apiVersion: argoproj.io/v1alpha1
@@ -41,7 +41,7 @@ spec:
   project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: chat-app
+    - chart: chat-app
     helm:
       values: |
         replicaCount: 1

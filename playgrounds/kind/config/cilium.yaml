@@ -1,7 +1,8 @@
+---
 kubeProxyReplacement: true
 k8sServiceHost: kind-control-plane
 k8sServicePort: 6443
-nodePort: 
+nodePort:
   enabled: true
 
 localRedirectPolicy: true
@@ -16,8 +17,8 @@ routingMode: native
 ipv4NativeRoutingCIDR: 10.42.0.0/16
 
 externalIPs:
-  enabled:true
-  
+  enabled: true
+
 autoDirectNodeRoutes: true
 l2announcements:
   enabled: true
@@ -31,10 +32,10 @@ bpf:
 operator:
   enabled: true
   replicas: 1
-        
+
 hubble:
   enabled: false
-    
+
 gatewayAPI:
   enabled: true
 

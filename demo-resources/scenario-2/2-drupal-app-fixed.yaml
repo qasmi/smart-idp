@@ -21,10 +21,10 @@ metadata:
   namespace: kubecon-na
 spec:
   hard:
-    requests.cpu: "1"  
-    requests.memory: "1Gi" 
-    limits.cpu: "1"  
-    limits.memory: "1Gi" 
+    requests.cpu: "1"
+    requests.memory: "1Gi"
+    limits.cpu: "1"
+    limits.memory: "1Gi"
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -38,28 +38,28 @@ spec:
   project: kubecon-na
   revisionHistoryLimit: 3
   sources:
-  - chart: drupal
-    helm:
-      values: |
-        drupalUsername: admin
+    - chart: drupal
+      helm:
+        values: |
+          drupalUsername: admin
 
-        externalDatabase:
-          host: drupal-app-db-mariadb.kubecon-na.svc.cluster.local
-          port: 3306
-          database: bitnami_drupal
-          user: drupal
-          password: "super-pass"
+          externalDatabase:
+            host: drupal-app-db-mariadb.kubecon-na.svc.cluster.local
+            port: 3306
+            database: bitnami_drupal
+            user: drupal
+            password: "super-pass"
 
-        resources:
-          limits:
-            cpu: 500m
-            memory: 2000M
-          requests:
-            cpu: 500m
-            memory: 2000M
+          resources:
+            limits:
+              cpu: 500m
+              memory: 2000M
+            requests:
+              cpu: 500m
+              memory: 2000M
 
-    repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 21.0.*
+      repoURL: https://charts.bitnami.com/bitnami
+      targetRevision: 21.0.*
   syncPolicy:
     automated:
       prune: true
@@ -83,7 +83,7 @@ spec:
     targetRevision: "19.1.*"
     helm:
       values: |
-        
+
   destination:
     server: https://kubernetes.default.svc
     namespace: my-team-namespace

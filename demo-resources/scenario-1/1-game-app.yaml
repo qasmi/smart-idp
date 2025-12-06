@@ -1,3 +1,4 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -10,25 +11,25 @@ spec:
   project: user
   revisionHistoryLimit: 3
   sources:
-  - chart: dao-2048
-    helm:
-      values: |
-        nodeSelector:
-          role: storage
-        tolerations:
-          - key: role
-            value: storage
-            operator: Equal
-            effect: NoSchedule
-      
-        service:
-          type: LoadBalancer
+    - chart: dao-2048
+      helm:
+        values: |
+          nodeSelector:
+            role: storage
+          tolerations:
+            - key: role
+              value: storage
+              operator: Equal
+              effect: NoSchedule
 
-        imagePullSecrets: 
-          - game-2048-pull-secret
+          service:
+            type: LoadBalancer
 
-    repoURL: http://daocloud.github.io/dao-2048/
-    targetRevision: "1.2.1"
+          imagePullSecrets:
+            - game-2048-pull-secret
+
+      repoURL: http://daocloud.github.io/dao-2048/
+      targetRevision: "1.2.1"
   syncPolicy:
     automated:
       prune: true

@@ -91,9 +91,9 @@ spec:
       project: '{{ .project }}'
       revisionHistoryLimit: 3
       sources:
-      - repoURL: https://github.com/lucchmielowski/smart-idp.git
-        targetRevision: HEAD
-        ref: valuesRef
+        - repoURL: https://github.com/lucchmielowski/smart-idp.git
+          targetRevision: HEAD
+          ref: valuesRef
       destination:
         server: https://kubernetes.default.svc
         namespace: '{{ .namespace }}'
