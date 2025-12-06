@@ -192,15 +192,13 @@ spec:
 
         ### 2. Scheduling & Topology
 
-        **Node Scheduling (Deterministic)**
-        - Query live nodes: `kubectl get nodes -o json`.
-        - Evaluate:
-          - nodeSelector
-          - taints vs tolerations
-        - Output exactly one:
-          - **Schedulable:** list matching nodes
-          - **Unschedulable:** no nodes match → Pod will remain Pending
-        - No speculation allowed.
+        **Topology and Scheduling:**
+          * Node Selectors and Taints/Tolerations (Definitive Validation):
+              Query the live cluster nodes directly (kubectl get nodes -o json) and compare their labels and taints against the manifest requirements.
+              Produce an explicit, evidence-based determination:
+                - Schedulable: List all nodes that satisfy the manifest's nodeSelector and toleration criteria.
+                - Unschedulable: Explicitly confirm that no nodes match and that the workload will remain Pending until the mismatch is resolved.
+              Do not speculate — rely exclusively on live cluster data.
 
         **Pod Disruption Budgets**
         - Validate scaling, rollout, deletion against all matching PDBs.
@@ -212,15 +210,13 @@ spec:
 
         ### 3. Policy Validation (Kyverno)
 
-        For all CREATE or UPDATE resources:
-        - Validate against live Kyverno policies.
+       Use kyverno tools to validate the manifest resources against the policies
         - For each violation output:
           - Policy name
           - Rule name
           - Resource
           - Severity
           - Message
-        - Omit section if zero violations.
 
         ### 4. Operational & Runtime Readiness
 
@@ -236,8 +232,6 @@ spec:
         **External Services**
         - If `ExternalName` or external endpoint unresolved → CONNECTION FAILURE risk.
 
-
-
       ## Safety & Behavior Rules
 
         * **Operation Mode:** Exclusively **READ-ONLY** or **DRY-RUN**.
@@ -251,7 +245,7 @@ spec:
 
         Execution ends **only** after:
 
-        1. kyverno policy analysis.
+        1. Dont skip kyverno policy analysis.
         2. PR comment successfully submitted, or
         3. 3 retries fail with logged error details.
 
