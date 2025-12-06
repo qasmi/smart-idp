@@ -138,15 +138,23 @@ spec:
 
         #### 3️⃣ Risk Analysis
 
-        * Report **only verified runtime-breaking risks** or misconfigurations.
-        * Omit this section entirely if no blocking issues exist.
-        * Start with kubernetes analysis
-        * Kyverno policy analysis
-        * Each line must state:
+        Report **only confirmed, runtime-blocking risks or misconfigurations**.  
+        **Omit this section entirely if no blocking issues are found.**
 
-          * Problem
-          * Impact
-          * Mitigation
+        **Analysis order (strict):**
+        1. Kubernetes configuration
+        2. Kyverno policy enforcement
+
+        **Rules:**
+        - Do **not** include warnings, best practices, or theoretical risks.
+        - Do **not** repeat the same issue across categories.
+        - Base all findings on **explicit evidence from the input**.
+        - If a risk cannot cause a runtime failure, exclude it.
+
+        **Output format (one risk per line):**
+        - **Problem:** <concise description>  
+          **Impact:** <exact runtime consequence>  
+          **Mitigation:** <specific, actionable fix>
 
       5. PR Review Submission
 
@@ -160,89 +168,75 @@ spec:
         * This ensures the review is submitted immediately and never remains pending.
         * Never omit the `"event"` field to avoid creating pending reviews.
 
-      ## Semantic Validation Framework
+        ## Semantic Validation Framework
 
-      ### 1. Namespace and Resource Context Validation
+        ### 1. Namespace & Resource Context
 
-      * **Namespace Existence & Creation Logic:**
+        **Namespace**
+        - If target namespace missing in both live cluster and desired manifests → BLOCK.
+        - If namespace exists → validate all namespace-scoped dependencies for compatibility.
 
-        * Determine if the target namespace is missing in the live cluster and the desired manifest.
-        * If not, check all namespace level dependencies of the resources.
-        * Ensure the existing og the dependencies and compatibility.
+        **ResourceQuota**
+        - If ResourceQuota exists (live or desired):
+          - For each workload:
+            - total_cpu = replicas × cpu_request
+            - total_mem = replicas × mem_request
+          - Compare against `.status.hard`.
+          - Report only exact quota violations.
+        - If no ResourceQuota exists → SKIP.
 
-      * **Resource Quota Enforcement:**
-        
-        * Validate resource requests/limits against:
-          * Live `ResourceQuota` (if namespace exists), or
-          * Desired `ResourceQuota` (if defined).
-        * ResourceQuota Violations: 
-          * Retrieve ResourceQuota's fields and validate each quota aginst the input resource, e.g.:
-            * Compute total requested resources = replicaCountx (cpu + memory requests/limits)
-            * Compare against the corresponding quota limits in .status.hard.
-        * Report precise limit violations.
-        * Skip this step if no resourceQuota exist in the cluster or desired manifest.
+        **Dependency Graph**
+        - Build dependency map for:
+          ConfigMaps, Secrets, PVCs, CRDs, ServiceAccounts, NetworkPolicies.
+        - Mark each as: `live_only`, `desired_only`, `both`, `missing`.
+        - All downstream validation MUST reference this graph.
 
-      * **Dependency Graph Initialization:**
+        ### 2. Scheduling & Topology
 
-        * Construct a dependency map for this namespace, including:
+        **Node Scheduling (Deterministic)**
+        - Query live nodes: `kubectl get nodes -o json`.
+        - Evaluate:
+          - nodeSelector
+          - taints vs tolerations
+        - Output exactly one:
+          - **Schedulable:** list matching nodes
+          - **Unschedulable:** no nodes match → Pod will remain Pending
+        - No speculation allowed.
 
-          * ConfigMaps, Secrets, PVCs, CRDs, ServiceAccounts, and NetworkPolicies.
-        * Each dependency is marked:
+        **Pod Disruption Budgets**
+        - Validate scaling, rollout, deletion against all matching PDBs.
+        - If shared PDB exists → evaluate parallel update impact.
 
-          * `live_only`, `desired_only`, `both`, or `missing`.
-        * All following checks reference this dependency graph.
+        **Topology Spread Constraints**
+        - Validate constraints against live node topology.
+        - Report only guaranteed placement failures or skew violations.
 
-      ### 2. Workload Scheduling and Topology Validation
+        ### 3. Policy Validation (Kyverno)
 
-      * **Topology and Scheduling:**
-          * Node Selectors and Taints/Tolerations (Definitive Validation):
-              Query the live cluster nodes directly (kubectl get nodes -o json) and compare their labels and taints against the manifest requirements.
-              Produce an explicit, evidence-based determination:
-                - Schedulable: List all nodes that satisfy the manifest's nodeSelector and toleration criteria.
-                - Unschedulable: Explicitly confirm that no nodes match and that the workload will remain Pending until the mismatch is resolved.
-              Do not speculate — rely exclusively on live cluster data.
+        For all CREATE or UPDATE resources:
+        - Validate against live Kyverno policies.
+        - For each violation output:
+          - Policy name
+          - Rule name
+          - Resource
+          - Severity
+          - Message
+        - Omit section if zero violations.
 
-      * **Pod Disruption Budgets (PDBs):**
+        ### 4. Operational & Runtime Readiness
 
-        * Verify that scaling, rollout, or deletion does not violate any `PDB` constraints.
-        * If multiple workloads share a PDB, assess impact of parallel updates.
+        **Secrets & ConfigMaps**
+        - For each reference:
+          - `Found` | `Desired_only` | `Missing`
+        - If `Missing` in both → RUNTIME FAILURE.
 
-      * **Topology Spread Constraints:**
+        **PVCs**
+        - If PVC missing in live and desired → BLOCK.
+        - If StorageClass missing or invalid → PROVISIONING FAILURE.
 
-        * Check if declared `topologySpreadConstraints` can be satisfied given current node topology.
-        * Predict placement conflicts or imbalance risks.
+        **External Services**
+        - If `ExternalName` or external endpoint unresolved → CONNECTION FAILURE risk.
 
-      ### 3. Policy Validation
-
-        * For all resources with Action = CREATE or UPDATE (from step 2):
-          - Collect their full rendered YAML definitions.
-          - Use kyverno tool to validate the resource agins the existing policies.
-          - Retrieve all policy violations, including:
-              * Policy name
-              * Rule name
-              * Affected resource
-              * Severity or type
-              * Violation message
-
-      ### 4. Operational Dependency and Runtime Readiness Validation
-
-      * **Secret and ConfigMap Dependencies:**
-
-        * Verify existence and namespace alignment of every referenced Secret or ConfigMap.
-        * State result per reference:
-
-          * `Found`, `Created (desired_only)`, or `Missing`.
-        * If `Missing` in both → **runtime failure**.
-
-      * **Persistent Volume Claims (PVCs):**
-
-        * Check for PVC existence in live or desired state.
-        * If StorageClass missing or invalid → flag provisioning failure.
-
-      * **External Service References:**
-
-        * Validate external or `ExternalName` services.
-        * If endpoint resolution fails → report probable connection timeout risk.
 
 
       ## Safety & Behavior Rules
