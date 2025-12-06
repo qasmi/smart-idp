@@ -1,29 +1,29 @@
-# ---
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: game-2048
-#   namespace: argocd
-# spec:
-#   destination:
-#     namespace: demo
-#     server: https://kubernetes.default.svc
-#   project: user
-#   revisionHistoryLimit: 3
-#   source:
-#     repoURL: http://daocloud.github.io/dao-2048/
-#     chart: dao-2048
-#     targetRevision: "1.2.1"
-#     helm:
-#       values: |
-#         replicaCount: 1
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: game-2048
+  namespace: argocd
+spec:
+  destination:
+    namespace: demo
+    server: https://kubernetes.default.svc
+  project: user
+  revisionHistoryLimit: 3
+  source:
+    repoURL: http://daocloud.github.io/dao-2048/
+    chart: dao-2048
+    targetRevision: "1.2.1"
+    helm:
+      values: |
+        replicaCount: 1
 
-#         nodeSelector:
-#           kubernetes.io/hostname: kind-worker
+        nodeSelector:
+          kubernetes.io/hostname: kind-worker
 
-#         service:
-#           type: LoadBalancer
-#   syncPolicy:
-#     automated:
-#       prune: true
-#       selfHeal: true
+        service:
+          type: LoadBalancer
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
