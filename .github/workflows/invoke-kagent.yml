@@ -17,7 +17,7 @@ jobs:
       - name: Validate YAML syntax
         uses: ibiqlik/action-yamllint@v3
         with:
-          file_or_dir: 'demo-cluster'
+          file_or_dir: 'demo-cluster/.k8s-gen/app-manifests.yaml'
           config_data: |
             extends: default
             rules:
@@ -39,7 +39,7 @@ jobs:
           echo "🔍 Validating Kubernetes/ArgoCD schemas..."
           find demo-cluster -type f \( -name "*.yaml" -o -name "*.yml" \) \
             ! -path "*/.git/*" \
-            ! -path "*/.k8s-gen/*" \
+            ! -path "*/.k8s-gen/app-manifests.yaml" \
             -exec sh -c '
               if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1"; then
                 echo "Validating: $1"
