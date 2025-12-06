@@ -4,7 +4,7 @@ name: Validate GitOps Manifests
 on:
   pull_request:
     branches:
-      - main
+      - demo-luc
 
 jobs:
   validate:
@@ -245,7 +245,7 @@ jobs:
         uses: ckotzbauer/kyverno-test-action@v2
         with:
           resource-files: '/tmp/kyverno-resources/*.yaml'
-          policy-files: 'https://raw.githubusercontent.com/lucchmielowski/kyverno-mcp/refs/heads/main/pkg/tools/policies/pod-security.yaml'
+          policy-files: 'https://raw.githubusercontent.com/lucchmielowski/kyverno-mcp/refs/heads//pkg/tools/policies/pod-security.yaml'
 
       - name: Summary
         if: success()

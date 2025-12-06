@@ -10,7 +10,7 @@ spec:
     - server: https://kubernetes.default.svc
       namespace: kyverno
   sourceRepos:
-    - https://github.com/lucchmielowski/smart-idp
+    - https://github.com/qasmi/smart-idp
   clusterResourceWhitelist:
     - group: kyverno.io
       kind: ClusterPolicy
@@ -27,8 +27,8 @@ spec:
     namespace: kyverno
   revisionHistoryLimit: 3
   source:
-    repoURL: https://github.com/lucchmielowski/smart-idp
-    targetRevision: refs/heads/main
+    repoURL: https://github.com/qasmi/smart-idp
+    targetRevision: demo-luc
     path: policies
     directory:
       recurse: true

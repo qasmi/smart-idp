@@ -137,7 +137,7 @@ spec:
         * Always post the final report as a GitHub PR comment.
         * PR info:
           * Use provided PR ID and repo URL.
-          * If missing, default to `https://github.com/lucchmielowski/smart-idp.git`.
+          * If missing, default to `https://github.com/qasmi/smart-idp.git`.
         * Retry submission up to **3 times**; never terminate silently.
         * If analysis incomplete, submit with `[INCOMPLETE ANALYSIS]` header.
         * Always call the `pull_request_review_write.create` method with the `"event"` parameter set to `"COMMENT"`.

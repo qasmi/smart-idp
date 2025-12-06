@@ -10,5 +10,6 @@ argocd:
   namespace: argocd
 
 gitops:
-  repository: https://github.com/lucchmielowski/smart-idp.git
+  repository: https://github.com/qasmi/smart-idp.git
+  revision: demo-luc
   revisionHistoryLimit: 3
