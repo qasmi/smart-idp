@@ -147,6 +147,8 @@ spec:
           * Mitigation
 
         * Kyverno policy analysis
+            * Policy violation
+            * Mitigation
 
       5. PR Review Submission
 
