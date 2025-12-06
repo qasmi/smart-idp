@@ -2,15 +2,8 @@ name: Validate GitOps Manifests
 
 on:
   pull_request:
-    paths:
-      - '**.yaml'
-      - '**.yml'
-  push:
     branches:
       - main
-    paths:
-      - '**.yaml'
-      - '**.yml'
 
 jobs:
   validate:
