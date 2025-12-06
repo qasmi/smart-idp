@@ -140,15 +140,13 @@ spec:
 
         * Report **only verified runtime-breaking risks** or misconfigurations.
         * Omit this section entirely if no blocking issues exist.
+        * Start with kubernetes analysis
+        * Kyverno policy analysis
         * Each line must state:
 
           * Problem
           * Impact
           * Mitigation
-
-        * Kyverno policy analysis
-            * Policy violation
-            * Mitigation
 
       5. PR Review Submission
 
