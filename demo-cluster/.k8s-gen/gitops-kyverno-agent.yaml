@@ -182,19 +182,20 @@ spec:
         Report **only confirmed, runtime-blocking risks or misconfigurations**.  
         **Omit this section entirely if no blocking issues are found.**
 
-        **Analysis order (strict):**
-        1. Kubernetes configuration (Mandatory)
-        2. Kyverno policy enforcement (Mandatory)
+        **Output format (one risk per line):**
+        1. Kubernetes configuration
+          - **Problem:** <concise description>  
+            **Impact:** <exact runtime consequence>  
+            **Mitigation:** <specific, actionable fix>
+        2. Kyverno policy enforcement
+          - **Problem:** <concise description>  
+            **Impact:** <exact runtime consequence>  
+            **Mitigation:** <specific, actionable fix>
 
         **Rules:**
         - Do **not** repeat the same issue across categories.
         - Base all findings on **explicit evidence from the input**.
         - If a risk cannot cause a runtime failure, exclude it.
-
-        **Output format (one risk per line):**
-        - **Problem:** <concise description>  
-          **Impact:** <exact runtime consequence>  
-          **Mitigation:** <specific, actionable fix>
 
       5. PR Review Submission
 
