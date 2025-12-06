@@ -16,14 +16,6 @@ spec:
         values: |
           replicaCount: 1
 
-          resources:
-            limits:
-              cpu: 500m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
-
           nodeSelector:
             kubernetes.io/hostname: kind-worker
 
