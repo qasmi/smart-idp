@@ -1,0 +1,106 @@
+name: Validate GitOps Manifests
+
+on:
+  pull_request:
+    paths:
+      - '**.yaml'
+      - '**.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**.yaml'
+      - '**.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          # Install yamllint
+          pip3 install yamllint
+          # Install kubeconform
+          wget -q https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz
+          tar xf kubeconform-linux-amd64.tar.gz
+          sudo mv kubeconform /usr/local/bin/
+          # Install Kyverno CLI
+          KYVERNO_VERSION=$(curl -s https://api.github.com/repos/kyverno/kyverno/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/' | sed 's/v//')
+          wget -q "https://github.com/kyverno/kyverno/releases/latest/download/kyverno-cli-v${KYVERNO_VERSION}-linux-amd64.tar.gz" -O kyverno-cli.tar.gz
+          tar xf kyverno-cli.tar.gz
+          sudo mv kyverno /usr/local/bin/
+          kyverno version
+
+      - name: Validate YAML syntax
+        run: |
+          echo "🔍 Validating YAML syntax..."
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "./.git/*" \
+            ! -path "./node_modules/*" \
+            ! -path "./.github/*" \
+            -exec yamllint -d relaxed {} \; || exit 1
+          echo "✅ All YAML files are syntactically valid"
+
+      - name: Validate Kubernetes/ArgoCD schemas
+        run: |
+          echo "🔍 Validating Kubernetes/ArgoCD schemas..."
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "./.git/*" \
+            ! -path "./node_modules/*" \
+            ! -path "./.github/*" \
+            -exec sh -c '
+              if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1"; then
+                echo "Validating: $1"
+                kubeconform -strict -summary "$1" || exit 1
+              fi
+            ' _ {} \;
+
+      - name: Clone Kyverno policies
+        run: |
+          echo "📥 Cloning Kyverno policies..."
+          git clone --depth 1 https://github.com/lucchmielowski/oss-japan-policies.git /tmp/kyverno-policies
+          echo "✅ Policies cloned"
+
+      - name: Validate against Kyverno policies
+        run: |
+          echo "🛡️ Validating manifests against Kyverno policies..."
+          # Collect all Kubernetes resource files (excluding ArgoCD Application resources as they're not deployed directly)
+          mkdir -p /tmp/resources-to-validate
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "./.git/*" \
+            ! -path "./node_modules/*" \
+            ! -path "./.github/*" \
+            ! -path "./.k8s-gen/*" \
+            -exec sh -c '
+              if grep -q "kind:" "$1" && grep -q "apiVersion:" "$1" && ! grep -q "kind: Application" "$1"; then
+                cp "$1" /tmp/resources-to-validate/
+                echo "  Found resource: $1"
+              fi
+            ' _ {} \;
+          
+          # Validate all resources against policies
+          if [ "$(ls -A /tmp/resources-to-validate 2>/dev/null)" ]; then
+            echo "Running Kyverno policy validation..."
+            # Validate resources against policies (kyverno apply validates without needing a cluster)
+            kyverno apply /tmp/kyverno-policies --resource /tmp/resources-to-validate/ || exit 1
+            echo "✅ All manifests passed Kyverno policy checks"
+          else
+            echo "⚠️ No Kubernetes resources found to validate (ArgoCD Applications are skipped)"
+          fi
+
+      - name: Summary
+        if: success()
+        run: |
+          echo ""
+          echo "✅ All GitOps manifests validated successfully!"
+          echo ""
+          echo "📋 ArgoCD Applications found:"
+          find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
+            ! -path "./.git/*" \
+            ! -path "./node_modules/*" \
+            ! -path "./.github/*" \
+            -exec grep -l "kind: Application" {} \; | sed 's/^/  ✓ /' || echo "  (none found)"
+
