@@ -99,15 +99,56 @@ spec:
 
       2. Drift Comparison
 
-        For each resource of the full desired state (produced in step 1):
-        * **MANDATORY RESOURCE STATUS DETERMINATION:**
-          1.  **If Desired resource does not exist in the live cluster:** The Action is **CREATE**.
-          2.  **If Desired resource exists in the live cluster:** The Action is **UPDATE** (if fields differ) or **NO CHANGE** (if fields match).
-        * Output summary table:
+      For each Desired resource:
 
-          ```
-          | Kind | Namespace | Name | Action |
-          ```
+      A. Identity Match (MANDATORY)
+      A resource matches Live only if ALL match:
+      - apiVersion (normalized)
+      - kind
+      - metadata.name
+      - metadata.namespace (default = "default")
+
+      Cluster-scoped resources MUST use namespace = "".
+
+      If multiple matches → AMBIGUOUS → EXCLUDE.
+
+      --------------------------------------------------
+
+      B. Action Decision (EXACT)
+
+      If no Live match:
+      → Action = CREATE
+
+      If Live match exists:
+      → Compare ONLY these fields:
+        spec, data, stringData, rules, subjects, roleRef
+
+      IGNORE completely:
+        status
+        metadata.uid
+        metadata.resourceVersion
+        metadata.generation
+        metadata.creationTimestamp
+        metadata.managedFields
+        annotations.*
+
+      If equal → Action = NO CHANGE  
+      If different → Action = UPDATE
+
+      --------------------------------------------------
+
+      C. Diff Summary Output
+
+      Output ONLY:
+      | Kind | Namespace | Name | Action |
+
+      Include ONLY:
+      CREATE, UPDATE
+
+      Sort by:
+      Namespace → Kind → Name
+
+      NEVER guess drift or assume Helm resources are unchanged.
 
       3.  **Semantic Validation & Impact Prediction:**
 
