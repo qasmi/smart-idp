@@ -146,6 +146,8 @@ spec:
           * Impact
           * Mitigation
 
+        * Kyverno policy analysis
+
       5. PR Review Submission
 
         * Always post the final report as a GitHub PR comment.
