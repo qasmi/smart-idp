@@ -58,15 +58,16 @@ jobs:
               fi
             ' _ {} \;
 
-      - name: Clone Kyverno policies
+      - name: Download Kyverno policies
         run: |
-          echo "📥 Cloning Kyverno policies..."
-          git clone --depth 1 https://github.com/lucchmielowski/oss-japan-policies.git /tmp/kyverno-policies
-          echo "✅ Policies cloned"
+          echo "📥 Downloading Kyverno pod security policies..."
+          mkdir -p /tmp/kyverno-policies
+          wget -q https://raw.githubusercontent.com/lucchmielowski/kyverno-mcp/refs/heads/main/pkg/tools/policies/pod-security.yaml -O /tmp/kyverno-policies/pod-security.yaml
+          echo "✅ Policies downloaded"
 
       - name: Validate against Kyverno policies
         run: |
-          echo "🛡️ Validating manifests against Kyverno policies..."
+          echo "🛡️ Validating manifests against Kyverno pod security policies..."
           # Collect all Kubernetes resource files (excluding ArgoCD Application resources as they're not deployed directly)
           mkdir -p /tmp/resources-to-validate
           find . -type f \( -name "*.yaml" -o -name "*.yml" \) \
@@ -86,7 +87,7 @@ jobs:
             echo "Running Kyverno policy validation..."
             # Validate resources against policies (kyverno apply validates without needing a cluster)
             kyverno apply /tmp/kyverno-policies --resource /tmp/resources-to-validate/ || exit 1
-            echo "✅ All manifests passed Kyverno policy checks"
+            echo "✅ All manifests passed Kyverno pod security policy checks"
           else
             echo "⚠️ No Kubernetes resources found to validate (ArgoCD Applications are skipped)"
           fi

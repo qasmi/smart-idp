@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: kyverno-mcp-policies
+  namespace: argocd
+spec:
+  description: Project kyverno-mcp-policies
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: kyverno
+  sourceRepos:
+    - https://github.com/lucchmielowski/kyverno-mcp
+  clusterResourceWhitelist:
+    - group: kyverno.io
+      kind: ClusterPolicy
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-mcp-policies
+  namespace: argocd
+spec:
+  project: kyverno-mcp-policies
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  revisionHistoryLimit: 3
+  source:
+    repoURL: https://github.com/lucchmielowski/kyverno-mcp
+    targetRevision: refs/heads/main
+    path: pkg/tools/policies
+    directory:
+      recurse: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
