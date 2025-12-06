@@ -94,7 +94,7 @@ spec:
           * Extract `repoURL`, `chart`, `targetRevision`, `values`, `namespace`.
           * Merge `.helm.values` and `.helm.parameters` into a normalized Helm configuration.
           * Validate the chart reference (`repo/chart`). If invalid → mark as `FAILED_EXTRACTION`.
-        * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade --install --dry-run --output yaml` (or equivalent flags).
+        * Render the **desired manifest** using Helm tools to simulate the chart installation process using `helm upgrade repo/chart --install --dry-run --output yaml` (or equivalent flags).
         * Combine rendered Helm resources with the input manifest → full desired state.
 
       2. Drift Comparison
