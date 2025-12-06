@@ -47,3 +47,4 @@ spec:
       namespace: demo-oss-japan
   sourceRepos:
     - http://daocloud.github.io/dao-2048/
+
