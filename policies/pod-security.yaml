@@ -1,0 +1,103 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    kyverno.io/kubernetes-version: 1.22-1.23
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/description: Any additional capabilities not mentioned in
+      the allowed list, which includes AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, FSETID,
+      KILL, MKNOD, NET_BIND_SERVICE, SETFCAP, SETGID, SETPCAP, SETUID, SYS_CHROOT,
+      are prohibited and not permitted.
+    policies.kyverno.io/minversion: 1.6.0
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/title: Disallow Capabilities
+    policies.nirmata.io/remediation: https://github.com/nirmata/kyverno-policies/tree/main/pod-security/baseline/disallow-capabilities/remediate-disallow-capabilities.yaml
+    policies.nirmata.io/remediation-docs: https://docs.nirmata.io/policysets/podsecurity/baseline/disallow-capabilities/
+  name: disallow-capabilities
+spec:
+  background: true
+  rules:
+  - match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    name: adding-capabilities
+    validate:
+      deny:
+        conditions:
+          all:
+          - key: '{{ request.object.spec.[ephemeralContainers, initContainers, containers][].securityContext.capabilities.add[]
+              }}'
+            operator: AnyNotIn
+            value:
+            - AUDIT_WRITE
+            - CHOWN
+            - DAC_OVERRIDE
+            - FOWNER
+            - FSETID
+            - KILL
+            - MKNOD
+            - NET_BIND_SERVICE
+            - SETFCAP
+            - SETGID
+            - SETPCAP
+            - SETUID
+            - SYS_CHROOT
+      message: Adding capabilities beyond those listed in the policy rule is disallowed.
+  validationFailureAction: Audit
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  annotations:
+    kyverno.io/kubernetes-version: 1.22-1.23
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/description: Containers must be required to run as non-root
+      users. This policy ensures either the field  spec.securityContext.runAsNonRoot
+      is set to `true`, or the fields spec.containers[*].securityContext.runAsNonRoot,
+      spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot
+      is set to `true`. A known issue prevents a policy such as this using `anyPattern`
+      from being persisted properly in Kubernetes 1.23.0-1.23.2.
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/title: Require runAsNonRoot
+    policies.nirmata.io/remediation: https://github.com/nirmata/kyverno-policies/tree/main/pod-security/restricted/require-run-as-nonroot/remediate-require-run-as-nonroot.yaml
+    policies.nirmata.io/remediation-docs: https://docs.nirmata.io/policysets/podsecurity/restricted/require-run-as-non-root/
+  name: require-run-as-nonroot
+spec:
+  background: true
+  rules:
+  - match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    name: run-as-non-root
+    validate:
+      anyPattern:
+      - spec:
+          =(ephemeralContainers):
+          - =(securityContext):
+              =(runAsNonRoot): "true"
+          =(initContainers):
+          - =(securityContext):
+              =(runAsNonRoot): "true"
+          containers:
+          - =(securityContext):
+              =(runAsNonRoot): "true"
+          securityContext:
+            runAsNonRoot: "true"
+      - spec:
+          =(ephemeralContainers):
+          - securityContext:
+              runAsNonRoot: "true"
+          =(initContainers):
+          - securityContext:
+              runAsNonRoot: "true"
+          containers:
+          - securityContext:
+              runAsNonRoot: "true"
+      message: Running the container as root is not allowed.
+  validationFailureAction: Enforce
