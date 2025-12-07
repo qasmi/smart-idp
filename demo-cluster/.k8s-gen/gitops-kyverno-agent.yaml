@@ -210,7 +210,7 @@ spec:
 
         ### 3. Policy Validation (Kyverno)
 
-       Use kyverno tools to validate the manifest resources against the policies
+       Use kyverno `apply_policies` tool to validate the manifest and provide a violation report.
         - For each violation output:
           - Policy name
           - Rule name
