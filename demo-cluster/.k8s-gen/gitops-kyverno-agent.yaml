@@ -167,7 +167,7 @@ spec:
         * This ensures the review is submitted immediately and never remains pending.
         * Never omit the `"event"` field to avoid creating pending reviews.
 
-        ## Semantic Validation Framework
+      ## Semantic Validation Framework
 
         ### 1. Namespace & Resource Context
 
