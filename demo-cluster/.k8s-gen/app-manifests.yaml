@@ -19,13 +19,12 @@ spec:
     - chart: dao-2048
       helm:
         values: |
-          resources: 
-            limits:
-              cpu: 500m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
           securityContext:
             runAsNonRoot: true
           service:
