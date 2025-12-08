@@ -13,19 +13,18 @@ spec:
   destination:
     namespace: demo-oss-japan
     server: https://kubernetes.default.svc
-  project: user
+  project: demo-oss-japan
   revisionHistoryLimit: 3
   sources:
     - chart: dao-2048
       helm:
         values: |
-          resources:
-            limits:
-              cpu: 500m
-              memory: 128Mi
-            requests:
-              cpu: 100m
-              memory: 128Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
           securityContext:
             runAsNonRoot: true
           service:
@@ -36,3 +35,16 @@ spec:
     automated:
       prune: true
       selfHeal: true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: demo-oss-japan
+  namespace: argocd
+spec:
+  description: Demo project
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: demo-oss-japan
+  sourceRepos:
+    - http://daocloud.github.io/dao-2048/

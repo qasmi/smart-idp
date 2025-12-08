@@ -13,7 +13,7 @@ spec:
   destination:
     namespace: demo-oss-japan
     server: https://kubernetes.default.svc
-  project: user
+  project: demo-oss-japan
   revisionHistoryLimit: 3
   sources:
     - chart: dao-2048
