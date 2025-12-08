@@ -19,13 +19,15 @@ spec:
     - chart: dao-2048
       helm:
         values: |
-          nodeSelector:
-            role: storage
-          tolerations:
-            - key: role
-              value: storage
-              operator: Equal
-              effect: NoSchedule
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            runAsNonRoot: true
           service:
             type: LoadBalancer
       repoURL: http://daocloud.github.io/dao-2048/
