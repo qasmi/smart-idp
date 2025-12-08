@@ -2,10 +2,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: kyverno-mcp-policies
+  name: kyverno-policies
   namespace: argocd
 spec:
-  description: Project kyverno-mcp-policies
+  description: Project kyverno-policies
   destinations:
     - server: https://kubernetes.default.svc
       namespace: kyverno
@@ -18,10 +18,10 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kyverno-mcp-policies
+  name: kyverno-policies
   namespace: argocd
 spec:
-  project: kyverno-mcp-policies
+  project: kyverno-policies
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
