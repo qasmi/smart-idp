@@ -54,18 +54,17 @@ metadata:
   annotations:
     kyverno.io/kubernetes-version: 1.22-1.23
     policies.kyverno.io/category: Pod Security Standards (Restricted)
-    policies.kyverno.io/description: Containers must be required to run as non-root
-      users. This policy ensures either the field  spec.securityContext.runAsNonRoot
-      is set to `true`, or the fields spec.containers[*].securityContext.runAsNonRoot,
-      spec.initContainers[*].securityContext.runAsNonRoot, and spec.ephemeralContainers[*].securityContext.runAsNonRoot
-      is set to `true`. A known issue prevents a policy such as this using `anyPattern`
-      from being persisted properly in Kubernetes 1.23.0-1.23.2.
+    policies.kyverno.io/description: Privilege escalation, such as via set-user-ID
+      or set-group-ID file mode, should not be allowed. This policy ensures the fields
+      spec.containers[*].securityContext.allowPrivilegeEscalation, spec.initContainers[*].securityContext.allowPrivilegeEscalation,
+      and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation is
+      set to `false`.
     policies.kyverno.io/severity: critical
     policies.kyverno.io/subject: Pod
-    policies.kyverno.io/title: Require runAsNonRoot
-    policies.nirmata.io/remediation: https://github.com/nirmata/kyverno-policies/tree/main/pod-security/restricted/require-run-as-nonroot/remediate-require-run-as-nonroot.yaml
-    policies.nirmata.io/remediation-docs: https://docs.nirmata.io/policysets/podsecurity/restricted/require-run-as-non-root/
-  name: require-run-as-nonroot
+    policies.kyverno.io/title: Disallow Privilege Escalation
+    policies.nirmata.io/remediation: https://github.com/nirmata/kyverno-policies/tree/main/pod-security/restricted/disallow-privilege-escalation/remediate-disallow-privilege-escalation.yaml
+    policies.nirmata.io/remediation-docs: https://docs.nirmata.io/policysets/podsecurity/restricted/disallow-privilege-escalation/
+  name: disallow-privilege-escalation
 spec:
   background: true
   rules:
@@ -74,30 +73,18 @@ spec:
       - resources:
           kinds:
           - Pod
-    name: run-as-non-root
+    name: privilege-escalation
     validate:
-      anyPattern:
-      - spec:
-          =(ephemeralContainers):
-          - =(securityContext):
-              =(runAsNonRoot): "true"
-          =(initContainers):
-          - =(securityContext):
-              =(runAsNonRoot): "true"
-          containers:
-          - =(securityContext):
-              =(runAsNonRoot): "true"
-          securityContext:
-            runAsNonRoot: "true"
-      - spec:
+      message: Privilege escalation is disallowed.
+      pattern:
+        spec:
           =(ephemeralContainers):
           - securityContext:
-              runAsNonRoot: "true"
+              allowPrivilegeEscalation: "false"
           =(initContainers):
           - securityContext:
-              runAsNonRoot: "true"
+              allowPrivilegeEscalation: "false"
           containers:
           - securityContext:
-              runAsNonRoot: "true"
-      message: Running the container as root is not allowed.
-  validationFailureAction: Enforce
+              allowPrivilegeEscalation: "false"
+  validationFailureAction: Audit
